@@ -1,0 +1,116 @@
+---
+title: 'shift() in data.table v1.9.6 is slow for many groups #1534'
+output: html_document
+date: "2024-02-17"
+---
+
+shift() in data.table v1.9.6 is slow for many groups #1534
+
+```{r}
+library(data.table)
+dt <- data.table(Grp = rep(seq_len(1e6), each=10L))
+dt[, Value := sample(100L, size = .N, replace = TRUE)]
+
+system.time(dt[, PrevValueByGrp := shift(Value, type = "lag"), by = Grp][])
+#    user  system elapsed 
+#   19.50    0.80   20.34
+system.time(dt[, v := shift(Value, type = "lag")][rowid(Grp)==1L, v := NA][])
+#    user  system elapsed 
+#    1.00    0.87    1.25 
+
+dt[, all.equal(v, PrevValueByGrp)]
+# [1] TRUE
+```
+
+
+```{r}
+library(data.table)
+library(microbenchmark)
+basic_shift = shift
+bench = function(DT) print(microbenchmark(
+  DT[, shift(x, 1, type="lag"), y],
+  DT[, basic_shift(x, 1, type="lag"), y],
+  DT[, c(NA, head(x,-1)), y],
+  times = 10L, unit = "s"), signif=4)
+```
+
+
+```{r}
+
+
+library(atime)
+library(ggplot2)
+library(data.table)
+
+```
+
+```{r}
+  tdir <- tempfile()
+  dir.create(tdir)
+  git2r::clone("https://github.com/Rdatatable/data.table", tdir)
+  
+```
+
+
+```{r}
+
+atime.list.1534 <- atime::atime_versions(
+  pkg.path=tdir,
+  pkg.edit.fun=function(old.Package, new.Package, sha, new.pkg.path){
+    pkg_find_replace <- function(glob, FIND, REPLACE){
+      atime::glob_find_replace(file.path(new.pkg.path, glob), FIND, REPLACE)
+    }
+    Package_regex <- gsub(".", "_?", old.Package, fixed=TRUE)
+    Package_ <- gsub(".", "_", old.Package, fixed=TRUE)
+    new.Package_ <- paste0(Package_, "_", sha)
+    pkg_find_replace(
+      "DESCRIPTION", 
+      paste0("Package:\\s+", old.Package),
+      paste("Package:", new.Package))
+    pkg_find_replace(
+      file.path("src","Makevars.*in"),
+      Package_regex,
+      new.Package_)
+    pkg_find_replace(
+      file.path("R", "onLoad.R"),
+      Package_regex,
+      new.Package_)
+    pkg_find_replace(
+      file.path("R", "onLoad.R"),
+      sprintf('packageVersion\\("%s"\\)', old.Package),
+      sprintf('packageVersion\\("%s"\\)', new.Package))
+    pkg_find_replace(
+      file.path("src", "init.c"),
+      paste0("R_init_", Package_regex),
+      paste0("R_init_", gsub("[.]", "_", new.Package_)))
+    pkg_find_replace(
+      "NAMESPACE",
+      sprintf('useDynLib\\("?%s"?', Package_regex),
+      paste0('useDynLib(', new.Package_))
+  },
+  #https://github.com/Rdatatable/data.table/issues/4200#issuecomment-578629820, link to the setup code
+  N=10^seq(1,7),
+  setup={ 
+    DT = data.table(x = sample(N), y = sample(1e2,N,TRUE))
+  },
+  #system.time(d[, max(v1)-min(v2), by=id3])
+  expr=data.table:::`[.data.table`(DT,, shift(x, 1, type="lag"), y),
+  "Before"="9e6e45301ea89227414a4f6df1ffc679c5c7ef1c",#https://github.com/Rdatatable/data.table/commit/9e6e45301ea89227414a4f6df1ffc679c5c7ef1c
+  "Regression"="cd818080606591ac5348005732db0cadfb4e597c", #https://github.com/Rdatatable/data.table/commit/cd818080606591ac5348005732db0cadfb4e597c
+  "Fixed"="e88826e94127991754a8821ac8149d15f1f9c3c2")#https://github.com/Rdatatable/data.table/commit/e88826e94127991754a8821ac8149d15f1f9c3c2
+```
+
+
+```{r}
+png()
+plot(atime.list.1534)+
+  labs(title = "shift() in data.table v1.9.6 is slow for many groups #1534")
+
+png("atime.list.1534.png")
+plot(atime.list.1534)+
+  labs(title = "shift() in data.table v1.9.6 is slow for many groups #1534")
+dev.off()
+
+```
+
+

@@ -1,0 +1,109 @@
+---
+title: 'unique(DT) when there are no dups could be much faster #2013'
+output: html_document
+date: "2024-02-17"
+---
+
+
+unique(DT) when there are no dups could be much faster #2013
+
+
+```{r}
+set.seed(039203)
+NN = 1e8
+DT = data.table(
+  A = sample(1000, NN, TRUE),
+  B = sample(1000, NN, TRUE),
+  C = sample(1000, NN, TRUE)
+)
+DT = unique(DT)
+
+system.time(unique(DT))
+```
+
+```{r}
+
+
+library(atime)
+library(ggplot2)
+library(data.table)
+
+```
+
+```{r}
+  tdir <- tempfile()
+  dir.create(tdir)
+  git2r::clone("https://github.com/Rdatatable/data.table", tdir)
+  
+```
+
+
+```{r,message=FALSE,warning=FALSE}
+
+atime.list.2013 <- atime::atime_versions(
+  pkg.path=tdir,
+  pkg.edit.fun=function(old.Package, new.Package, sha, new.pkg.path){
+    pkg_find_replace <- function(glob, FIND, REPLACE){
+      atime::glob_find_replace(file.path(new.pkg.path, glob), FIND, REPLACE)
+    }
+    Package_regex <- gsub(".", "_?", old.Package, fixed=TRUE)
+    Package_ <- gsub(".", "_", old.Package, fixed=TRUE)
+    new.Package_ <- paste0(Package_, "_", sha)
+    pkg_find_replace(
+      "DESCRIPTION", 
+      paste0("Package:\\s+", old.Package),
+      paste("Package:", new.Package))
+    pkg_find_replace(
+      file.path("src","Makevars.*in"),
+      Package_regex,
+      new.Package_)
+    pkg_find_replace(
+      file.path("R", "onLoad.R"),
+      Package_regex,
+      new.Package_)
+    pkg_find_replace(
+      file.path("R", "onLoad.R"),
+      sprintf('packageVersion\\("%s"\\)', old.Package),
+      sprintf('packageVersion\\("%s"\\)', new.Package))
+    pkg_find_replace(
+      file.path("src", "init.c"),
+      paste0("R_init_", Package_regex),
+      paste0("R_init_", gsub("[.]", "_", new.Package_)))
+    pkg_find_replace(
+      "NAMESPACE",
+      sprintf('useDynLib\\("?%s"?', Package_regex),
+      paste0('useDynLib(', new.Package_))
+  },
+  
+  N=10^seq(1,20),
+  setup={ 
+    set.seed(039203)
+    DT = data.table(
+      A = sample(1000, N, TRUE),
+      B = sample(1000, N, TRUE),
+      C = sample(1000, N, TRUE)
+    )
+    DT = unique(DT)
+  },
+  expr=data.table:::`[.data.table`(unique(DT)),
+  #"Before"="81cf17e3c28d22dad818db22dafea3f7a830be2d",#https://github.com/Rdatatable/data.table/commit/81cf17e3c28d22dad818db22dafea3f7a830be2d
+  #"Regression"="9d1f3e29d6daf44ecc571153b8b383858c5d9ed1", #https://github.com/Rdatatable/data.table/tree/9d1f3e29d6daf44ecc571153b8b383858c5d9ed1
+  "Fixed"="1fd38629ec81af80c2ff57e475ff2e7f2c55f844")#https://github.com/Rdatatable/data.table/commit/1fd38629ec81af80c2ff57e475ff2e7f2c55f844
+```
+
+
+```{r}
+png()
+plot(atime.list.2013)+
+  labs(title = "unique(DT) when there are no dups could be much faster #2013")
+
+png("atime.list.2013.png")
+plot(atime.list.2013)+
+  labs(title = "unique(DT) when there are no dups could be much faster #2013")
+dev.off()
+
+```
+
+
+```
+

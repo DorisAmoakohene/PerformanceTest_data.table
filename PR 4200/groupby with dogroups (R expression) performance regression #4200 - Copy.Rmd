@@ -1,0 +1,93 @@
+---
+title: "groupby with dogroups 4200"
+author: "Doris Amoakohene"
+date: '`r Sys.Date()`'
+output: html_document
+---
+
+
+https://github.com/Rdatatable/data.table/issues/4200 -- Discusses Regression
+https://github.com/Rdatatable/data.table/issues/4200#issuecomment-578629820
+https://github.com/Rdatatable/data.table/pull/4558 --- Fixes Regression
+
+```{r}
+
+library(atime)
+library(ggplot2)
+library(data.table)
+
+```
+
+```{r}
+  tdir <- tempfile()
+  dir.create(tdir)
+  git2r::clone("https://github.com/Rdatatable/data.table", tdir)
+  
+```
+
+
+```{r}
+
+atime.list.4200 <- atime::atime_versions(
+pkg.path=tdir,
+pkg.edit.fun=function(old.Package, new.Package, sha, new.pkg.path){
+      pkg_find_replace <- function(glob, FIND, REPLACE){
+        atime::glob_find_replace(file.path(new.pkg.path, glob), FIND, REPLACE)
+      }
+      Package_regex <- gsub(".", "_?", old.Package, fixed=TRUE)
+      Package_ <- gsub(".", "_", old.Package, fixed=TRUE)
+      new.Package_ <- paste0(Package_, "_", sha)
+      pkg_find_replace(
+        "DESCRIPTION", 
+        paste0("Package:\\s+", old.Package),
+        paste("Package:", new.Package))
+      pkg_find_replace(
+        file.path("src","Makevars.*in"),
+        Package_regex,
+        new.Package_)
+      pkg_find_replace(
+        file.path("R", "onLoad.R"),
+        Package_regex,
+        new.Package_)
+      pkg_find_replace(
+        file.path("R", "onLoad.R"),
+        sprintf('packageVersion\\("%s"\\)', old.Package),
+        sprintf('packageVersion\\("%s"\\)', new.Package))
+      pkg_find_replace(
+        file.path("src", "init.c"),
+        paste0("R_init_", Package_regex),
+        paste0("R_init_", gsub("[.]", "_", new.Package_)))
+      pkg_find_replace(
+        "NAMESPACE",
+        sprintf('useDynLib\\("?%s"?', Package_regex),
+        paste0('useDynLib(', new.Package_))
+    },
+#https://github.com/Rdatatable/data.table/issues/4200#issuecomment-578629820, link to the setup code
+  N=10^seq(1,20),
+  setup={ 
+    set.seed(108)
+    d <- data.table(
+      id3 = sample(c(seq.int(N*0.9), sample(N*0.9, N*0.1, TRUE))),
+      v1 = sample(5L, N, TRUE),
+      v2 = sample(5L, N, TRUE))
+  },
+#system.time(d[, max(v1)-min(v2), by=id3])
+  expr=data.table:::`[.data.table`(d, , (max(v1)-min(v2)), by = id3),
+"Before"="15f0598b9828d3af2eb8ddc9b38e0356f42afe4f",#https://github.com/Rdatatable/data.table/tree/15f0598b9828d3af2eb8ddc9b38e0356f42afe4f
+  "Regression"="6f360be0b2a6cf425f6df751ca9a99ec5d35ed93", #https://github.com/Rdatatable/data.table/commit/6f360be0b2a6cf425f6df751ca9a99ec5d35ed93
+  "Fixed"="ba32f3cba38ec270587e395f6e6c26a80be36be6")#https://github.com/Rdatatable/data.table/commit/ba32f3cba38ec270587e395f6e6c26a80be36be6,link to the id that fixed the regression 
+```
+
+
+```{r}
+plot(atime.list.4200)+
+  labs(title = "groupby with dogroups (R expression) performance regression")
+
+png("atime.list.4200.png")
+plot(atime.list.4200)+
+  labs(title = "groupby with dogroups (R expression) performance regression")
+dev.off()
+
+```
+
+

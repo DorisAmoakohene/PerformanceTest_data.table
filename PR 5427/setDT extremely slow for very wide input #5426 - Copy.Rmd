@@ -1,0 +1,195 @@
+---
+title: 'setDT extremely slow for very wide input #5426'
+output: html_document
+date: "2024-02-02"
+---
+ issue Report https://github.com/Rdatatable/data.table/issues/5426
+ fixed by 5427 https://github.com/Rdatatable/data.table/pull/5427
+ 
+ 
+ 
+```{r}
+library(data.table)
+DT = replicate(1e7, 1, simplify = FALSE)
+system.time(setDT(DT))
+#    user  system elapsed 
+#  23.043   0.216  23.261 
+```
+ 
+```{r}
+# __ON MASTER__
+library(data.table)
+
+DT = replicate(1e7, 1, simplify = FALSE)
+system.time(setDT(DT))
+#    user  system elapsed 
+#  25.518   0.316  25.835 
+
+DT = replicate(1e7, 1, simplify = FALSE)
+system.time(setDT(DT))
+#    user  system elapsed 
+#  20.219   0.292  20.511 
+
+DT = replicate(1e7, 1, simplify = FALSE)
+# _not_ V1:Vncol_, so that these names aren't cached yet (doesn't matter much but still)
+names(DT) = seq_along(DT)
+system.time(setDT(DT))
+#    user  system elapsed 
+#  16.325   0.148  16.474 
+```
+ 
+ 
+ 
+ 
+```{r}
+
+
+
+library(atime)
+library(ggplot2)
+library(data.table)
+
+```
+
+```{r}
+  tdir <- tempfile()
+  dir.create(tdir)
+  git2r::clone("https://github.com/Rdatatable/data.table", tdir)
+  
+```
+
+
+```{r}
+
+atime.list.5427 <- atime::atime_versions(
+  pkg.path=tdir,
+  pkg.edit.fun=function(old.Package, new.Package, sha, new.pkg.path){
+    pkg_find_replace <- function(glob, FIND, REPLACE){
+      atime::glob_find_replace(file.path(new.pkg.path, glob), FIND, REPLACE)
+    }
+    Package_regex <- gsub(".", "_?", old.Package, fixed=TRUE)
+    Package_ <- gsub(".", "_", old.Package, fixed=TRUE)
+    new.Package_ <- paste0(Package_, "_", sha)
+    pkg_find_replace(
+      "DESCRIPTION", 
+      paste0("Package:\\s+", old.Package),
+      paste("Package:", new.Package))
+    pkg_find_replace(
+      file.path("src","Makevars.*in"),
+      Package_regex,
+      new.Package_)
+    pkg_find_replace(
+      file.path("R", "onLoad.R"),
+      Package_regex,
+      new.Package_)
+    pkg_find_replace(
+      file.path("R", "onLoad.R"),
+      sprintf('packageVersion\\("%s"\\)', old.Package),
+      sprintf('packageVersion\\("%s"\\)', new.Package))
+    pkg_find_replace(
+      file.path("src", "init.c"),
+      paste0("R_init_", Package_regex),
+      paste0("R_init_", gsub("[.]", "_", new.Package_)))
+    pkg_find_replace(
+      "NAMESPACE",
+      sprintf('useDynLib\\("?%s"?', Package_regex),
+      paste0('useDynLib(', new.Package_))
+  },
+  N=10^seq(1,20),
+  setup={ 
+    DT = replicate(N, 1, simplify = FALSE)
+  },
+  expr=data.table:::`[.data.table`(setDT(DT)),
+  "Master"= "6f43a96ad478e02a48f61939e0c0d3047e949353", #https://github.com/Rdatatable/data.table/commit/6f43a96ad478e02a48f61939e0c0d3047e949353,
+  
+  "PR5427"="bd2fc1eb3faeba573464cd63b2d420a0a4f9514e")#https://github.com/Rdatatable/data.table/pull/5427/commits/bd2fc1eb3faeba573464cd63b2d420a0a4f9514e
+```
+
+
+```{r}
+plot(atime.list.5427)+
+  labs(title = "setDT extremely slow for very wide input #5426")
+
+png("atime.list.5427.png")
+plot(atime.list.5427)+
+  labs(title = "setDT extremely slow for very wide input #5426")
+dev.off()
+
+```
+
+
+```{r}
+pkg.edit.DT <- function(old.Package, new.Package, sha, new.pkg.path){
+  pkg_find_replace <- function(glob, FIND, REPLACE){
+    atime::glob_find_replace(file.path(new.pkg.path, glob), FIND, REPLACE)
+  }
+  Package_regex <- gsub(".", "_?", old.Package, fixed=TRUE)
+  Package_ <- gsub(".", "_", old.Package, fixed=TRUE)
+  new.Package_ <- paste0(Package_, "_", sha)
+  pkg_find_replace(
+    "DESCRIPTION", 
+    paste0("Package:\\s+", old.Package),
+    paste("Package:", new.Package))
+  pkg_find_replace(
+    file.path("src","Makevars.*in"),
+    Package_regex,
+    new.Package_)
+  pkg_find_replace(
+    file.path("R", "onLoad.R"),
+    Package_regex,
+    new.Package_)
+  pkg_find_replace(
+    file.path("R", "onLoad.R"),
+    sprintf('packageVersion\\("%s"\\)', old.Package),
+    sprintf('packageVersion\\("%s"\\)', new.Package))
+  pkg_find_replace(
+    file.path("src", "init.c"),
+    paste0("R_init_", Package_regex),
+    paste0("R_init_", gsub("[.]", "_", new.Package_)))
+  pkg_find_replace(
+    "NAMESPACE",
+    sprintf('useDynLib\\("?%s"?', Package_regex),
+    paste0('useDynLib(', new.Package_))
+}
+version.expr.list <- atime::atime_versions_exprs(
+  pkg.path=tdir,
+  pkg.edit.fun=pkg.edit.DT,
+  expr={
+    data.table::setDTthreads(THREADS)
+    data.table:::`[.data.table`(setDT(DT))
+  },
+  PR5427="bd2fc1eb3faeba573464cd63b2d420a0a4f9514e",
+  master="6f43a96ad478e02a48f61939e0c0d3047e949353")
+(atime.grid.args <- list(
+  PR=c(version.expr.list["PR5427"], list(param.list=list(THREADS=2^seq(0,3)))),
+  other=c(version.expr.list["master"], list(param.list=list(THREADS=1)))))
+expr.list <- list()
+for(grid.i in seq_along(atime.grid.args)){
+  new.exprs <- do.call(atime::atime_grid, atime.grid.args[[grid.i]])
+  expr.list[names(new.exprs)] <- new.exprs
+}
+expr.list
+library(data.table)
+atime.result.5427 <- atime::atime(
+  N=as.integer(10^seq(1, 8, by=0.5)),
+  setup={
+    DT = replicate(N, 1, simplify = FALSE)
+  },
+  seconds.limit=1,
+  expr.list=expr.list)
+```
+
+
+```{r}
+plot(atime.result.5427)
+
+plot(atime.result.5427)+
+  labs(title = "Move some setDT validation checks to C #5427")
+
+png("atime.result.5427.png")
+plot(atime.result.5427)+
+  labs(title = "Move some setDT validation checks to C #5427")
+dev.off()
+```
+ 
+ 

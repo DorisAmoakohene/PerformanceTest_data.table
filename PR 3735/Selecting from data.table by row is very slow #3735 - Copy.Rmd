@@ -1,0 +1,279 @@
+---
+title: 'Selecting from data.table by row is very slow #3735'
+output: html_document
+date: "2024-02-02"
+---
+
+
+library(data.table)
+allIterations <- data.frame(v1 = runif(1e5), v2 = runif(1e5))
+DoSomething <- function(row) someCalculation <- row[["v1"]] + 1
+system.time(for (r in 1:nrow(allIterations)) DoSomething(allIterations[r, ]))
+#   user  system elapsed 
+#  3.384   0.007   3.392
+allIterations <- as.data.table(allIterations)
+setDTthreads(1)
+system.time(for (r in 1:nrow(allIterations)) DoSomething(allIterations[r, , with=c(i=FALSE)]))
+#   user  system elapsed 
+#  5.432   0.121   5.554 
+
+
+
+```{r}
+allIterations <- data.frame(v1 = runif(1e5), v2 = runif(1e5))
+DoSomething <- function(row) {
+  someCalculation <- row[["v1"]] + 1
+}
+system.time(
+       {
+         for (r in 1:nrow(allIterations)) {
+           DoSomething(allIterations[r, ])
+         }
+       }
+     )
+##   user  system elapsed 
+##   4.50    0.02    4.55 
+
+allIterations <- as.data.table(allIterations)
+system.time(
+       {
+         for (r in 1:nrow(allIterations)) {
+           DoSomething(allIterations[r, ])
+         }
+       }
+     )
+##   user  system elapsed 
+##   53.78   25.05   78.46 
+```
+
+
+
+```{r}
+
+
+library(atime)
+library(ggplot2)
+library(data.table)
+
+```
+
+```{r}
+  tdir <- tempfile()
+  dir.create(tdir)
+  git2r::clone("https://github.com/Rdatatable/data.table", tdir)
+  
+```
+
+
+```{r}
+
+atime.list.3735 <- atime::atime_versions(
+  pkg.path=tdir,
+  pkg.edit.fun=function(old.Package, new.Package, sha, new.pkg.path){
+    pkg_find_replace <- function(glob, FIND, REPLACE){
+      atime::glob_find_replace(file.path(new.pkg.path, glob), FIND, REPLACE)
+    }
+    Package_regex <- gsub(".", "_?", old.Package, fixed=TRUE)
+    Package_ <- gsub(".", "_", old.Package, fixed=TRUE)
+    new.Package_ <- paste0(Package_, "_", sha)
+    pkg_find_replace(
+      "DESCRIPTION", 
+      paste0("Package:\\s+", old.Package),
+      paste("Package:", new.Package))
+    pkg_find_replace(
+      file.path("src","Makevars.*in"),
+      Package_regex,
+      new.Package_)
+    pkg_find_replace(
+      file.path("R", "onLoad.R"),
+      Package_regex,
+      new.Package_)
+    pkg_find_replace(
+      file.path("R", "onLoad.R"),
+      sprintf('packageVersion\\("%s"\\)', old.Package),
+      sprintf('packageVersion\\("%s"\\)', new.Package))
+    pkg_find_replace(
+      file.path("src", "init.c"),
+      paste0("R_init_", Package_regex),
+      paste0("R_init_", gsub("[.]", "_", new.Package_)))
+    pkg_find_replace(
+      "NAMESPACE",
+      sprintf('useDynLib\\("?%s"?', Package_regex),
+      paste0('useDynLib(', new.Package_))
+  },
+  N=10^seq(1,20),
+  setup={ 
+    allIterations <- data.frame(v1 = runif(N), v2 = runif(N))
+    DoSomething <- function(row) {
+      someCalculation <- row[["v1"]] + 1
+      }
+      allIterations <- as.data.table(allIterations)
+      setDTthreads(1)
+      
+    },
+  expr=data.table:::`[.data.table`({
+    for (r in 1:nrow(allIterations)) {
+      DoSomething(allIterations[r, ])
+    }
+  }),
+  "master"="6f43a96ad478e02a48f61939e0c0d3047e949353",#https://github.com/Rdatatable/data.table/tree/6f43a96ad478e02a48f61939e0c0d3047e949353
+  "PR4488"="45952d1619365a4624d939575a934583c33c8fbb")#https://github.com/Rdatatable/data.table/pull/4488/commits/c33e98bb0a2f919bc1b428a5b7985f45f9d88a77 
+```
+
+
+```{r}
+plot(atime.list.3735)+
+  labs(title = "Selecting from data.table by row is very slow #3735")
+
+png("atime.list.3735.png")
+plot(atime.list.3735)+
+  labs(title = "Selecting from data.table by row is very slow #3735")
+dev.off()
+
+```
+allIterations <- data.frame(v1 = runif(1e5), v2 = runif(1e5))
+DoSomething <- function(row) {
+  someCalculation <- row[["v1"]] + 1
+}
+system.time(
+       {
+         for (r in 1:nrow(allIterations)) {
+           DoSomething(allIterations[r, ])
+         }
+       }
+     )
+##   user  system elapsed 
+##   4.50    0.02    4.55 
+
+allIterations <- as.data.table(allIterations)
+system.time(
+       {
+         for (r in 1:nrow(allIterations)) {
+           DoSomething(allIterations[r, ])
+         }
+       }
+     )
+##   user  system elapsed 
+##   53.78   25.05   78.46 
+
+```{r}
+result.3735 <- atime::atime(
+  
+  N = 10^seq(1,7),
+  setup = {
+    allIterations <- data.frame(v1 = runif(N), v2 = runif(N))
+    DoSomething <- function(row) {
+      someCalculation <- row[["v1"]] + 1
+      
+    }
+  },
+  seconds.limit = 2,
+  expr.list = list(
+    DF = quote(atime({
+      for (r in 1:nrow(allIterations)) {
+        DoSomething(allIterations[r, ])
+      }
+    })),
+    DT = quote(atime({
+      for (r in 1:nrow(as.data.table(allIterations))) {
+        DoSomething(as.data.table(allIterations)[r, ])
+      }
+    }))
+  ),
+  
+)
+```
+
+```{r}
+plot(result.3735)+
+  labs(title = "Selecting from data.table by row is very slow #3735")
+
+png("result.3735.png")
+plot(result.3735)+
+  labs(title = "Selecting from data.table by row is very slow #3735")
+dev.off()
+```
+```{r}
+
+atime.list.3735branches <- atime::atime_versions(
+  pkg.path=tdir,
+  pkg.edit.fun=function(old.Package, new.Package, sha, new.pkg.path){
+    pkg_find_replace <- function(glob, FIND, REPLACE){
+      atime::glob_find_replace(file.path(new.pkg.path, glob), FIND, REPLACE)
+    }
+    Package_regex <- gsub(".", "_?", old.Package, fixed=TRUE)
+    Package_ <- gsub(".", "_", old.Package, fixed=TRUE)
+    new.Package_ <- paste0(Package_, "_", sha)
+    pkg_find_replace(
+      "DESCRIPTION", 
+      paste0("Package:\\s+", old.Package),
+      paste("Package:", new.Package))
+    pkg_find_replace(
+      file.path("src","Makevars.*in"),
+      Package_regex,
+      new.Package_)
+    pkg_find_replace(
+      file.path("R", "onLoad.R"),
+      Package_regex,
+      new.Package_)
+    pkg_find_replace(
+      file.path("R", "onLoad.R"),
+      sprintf('packageVersion\\("%s"\\)', old.Package),
+      sprintf('packageVersion\\("%s"\\)', new.Package))
+    pkg_find_replace(
+      file.path("src", "init.c"),
+      paste0("R_init_", Package_regex),
+      paste0("R_init_", gsub("[.]", "_", new.Package_)))
+    pkg_find_replace(
+      "NAMESPACE",
+      sprintf('useDynLib\\("?%s"?', Package_regex),
+      paste0('useDynLib(', new.Package_))
+  },
+  N=10^seq(1,20),
+  setup={ 
+    allIterations <- data.frame(v1 = runif(N), v2 = runif(N))
+    DoSomething <- function(row) {
+      someCalculation <- row[["v1"]] + 1
+      }
+      allIterations <- as.data.table(allIterations)
+      setDTthreads(1)
+      
+    },
+  expr=data.table:::`[.data.table`({
+    for (r in 1:nrow(allIterations)) {
+      DoSomething(allIterations[r, ])
+    }
+  }),
+  "before"="d47a83fb2e25582e508f191f87a31ca81b736b57",#https://github.com/Rdatatable/data.table/commit/d47a83fb2e25582e508f191f87a31ca81b736b57
+  "Regression"="469b9ebe16adabd5f7c68c2727f19c83fd444e43",#https://github.com/Rdatatable/data.table/pull/4488/commits/469b9ebe16adabd5f7c68c2727f19c83fd444e43
+  "fixed"="45952d1619365a4624d939575a934583c33c8fbb") #https://github.com/Rdatatable/data.table/pull/4488/commits/45952d1619365a4624d939575a934583c33c8fbb
+```
+
+
+
+```{r}
+plot(atime.list.3735branches)+
+  labs(title = "Selecting from data.table by row is very slow #3735")
+
+png("atime.list.3735branches.png")
+plot(atime.list.3735branches)+
+  labs(title = "Selecting from data.table by row is very slow #3735")
+dev.off()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

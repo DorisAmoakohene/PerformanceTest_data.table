@@ -1,0 +1,110 @@
+---
+title: '[[ by group takes forever (24 hours +) with v1.13.0 vs 4 seconds with v1.12.8
+  #4646'
+author: "Doris Afriyie Amoakohene"
+date: "2024-02-14"
+output: html_document
+---
+
+
+```{r}
+library(data.table) #1.13.0
+
+set.seed(123L)
+n = 500L
+n_nested = 40L
+dt = data.table(id = seq_len(n),
+                value = replicate(n, data.table(val1 = sample(n_nested)), simplify = FALSE))
+
+bench::mark(
+    dt[seq_len(.N), value[[1L]], by = id]
+    , dt[, value[[1L]], by = id]
+)
+#> Warning: Some expressions had a GC in every iteration; so filtering is disabled.
+#> # A tibble: 2 x 6
+#>   expression                                 min   median `itr/sec` mem_alloc
+#>   <bch:expr>                            <bch:tm> <bch:tm>     <dbl> <bch:byt>
+#> 1 dt[seq_len(.N), value[[1L]], by = id]   2.56ms   3.05ms    287.      2.24MB
+#> 2 dt[, value[[1L]], by = id]            219.41ms 250.98ms      3.98   51.91MB
+#> # ... with 1 more variable: `gc/sec` <dbl>
+```
+
+
+```{r}
+
+library(atime)
+library(ggplot2)
+library(data.table)
+
+```
+
+```{r}
+  tdir <- tempfile()
+  dir.create(tdir)
+  git2r::clone("https://github.com/Rdatatable/data.table", tdir)
+  
+```
+
+
+```{r}
+
+atime.list.4646 <- atime::atime_versions(
+  pkg.path=tdir,
+  pkg.edit.fun=function(old.Package, new.Package, sha, new.pkg.path){
+    pkg_find_replace <- function(glob, FIND, REPLACE){
+      atime::glob_find_replace(file.path(new.pkg.path, glob), FIND, REPLACE)
+    }
+    Package_regex <- gsub(".", "_?", old.Package, fixed=TRUE)
+    Package_ <- gsub(".", "_", old.Package, fixed=TRUE)
+    new.Package_ <- paste0(Package_, "_", sha)
+    pkg_find_replace(
+      "DESCRIPTION", 
+      paste0("Package:\\s+", old.Package),
+      paste("Package:", new.Package))
+    pkg_find_replace(
+      file.path("src","Makevars.*in"),
+      Package_regex,
+      new.Package_)
+    pkg_find_replace(
+      file.path("R", "onLoad.R"),
+      Package_regex,
+      new.Package_)
+    pkg_find_replace(
+      file.path("R", "onLoad.R"),
+      sprintf('packageVersion\\("%s"\\)', old.Package),
+      sprintf('packageVersion\\("%s"\\)', new.Package))
+    pkg_find_replace(
+      file.path("src", "init.c"),
+      paste0("R_init_", Package_regex),
+      paste0("R_init_", gsub("[.]", "_", new.Package_)))
+    pkg_find_replace(
+      "NAMESPACE",
+      sprintf('useDynLib\\("?%s"?', Package_regex),
+      paste0('useDynLib(', new.Package_))
+  },
+  N=10^seq(1,7),
+  setup={ 
+    set.seed(123L)
+    n_nested = 40L
+    dt = data.table(id = seq_len(n),
+                    value = replicate(n, data.table(val1 = sample(n_nested)), simplify = FALSE))
+  },
+  expr=data.table:::`[.data.table`(dt,, value[[1L]], by = id),
+  "Before"="4fd649ea54c582618015c6c66f15d8f65d3ca89c",#https://github.com/Rdatatable/data.table/tree/4fd649ea54c582618015c6c66f15d8f65d3ca89c
+  "Regression"="e787bf98af46de771bebe057debbdd4397156f79", #https://github.com/Rdatatable/data.table/tree/e787bf98af46de771bebe057debbdd4397156f79
+  "Fixed"="93967418ee0e40370ce9d4c4b63bf599e4ef1ecd") #fixed:#https://github.com/Rdatatable/data.table/tree/93967418ee0e40370ce9d4c4b63bf599e4ef1ecd
+```
+
+
+```{r}
+plot(atime.list.4646)+
+  labs(title = "[[ by group takes forever (24 hours +) with v1.13.0 vs 4 seconds with v1.12.8 #4646")
+
+png("atime.list.4646.png")
+plot(atime.list.4646)+
+  labs(title = "[[ by group takes forever (24 hours +) with v1.13.0 vs 4 seconds with v1.12.8 #4646")
+dev.off()
+
+```
+```
+

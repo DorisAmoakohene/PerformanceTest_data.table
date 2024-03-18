@@ -1,0 +1,118 @@
+---
+title: 'join operation almost 2 times slower
+#3928'
+output: html_document
+date: "2024-02-19"
+---
+
+Low performance of setkey function for version 1.12.0 and later #4788
+
+```{r}
+
+library(data.table)
+setDTthreads(2L)
+set.seed(108)
+n2 = 1:366000
+n1 = sample(n2, 30000)
+d1=data.table(id1=paste0("id",sample(n1)), id2=paste0("id",sample(n1)), v1=n1)
+d2=data.table(id1=paste0("id",sample(n2)), id2=paste0("id",sample(n2)), v2=n2)
+system.time(d2[d1, v1 := i.v1, on=c("id1","id2")])
+```
+
+
+```{r,warning=FALSE}
+library(data.table)
+library(atime)
+library(kit)
+
+```
+
+
+```{r}
+tdir <- tempfile()
+dir.create(tdir)
+git2r::clone("https://github.com/Rdatatable/data.table", tdir)
+  
+```
+
+
+
+```{r,warning=FALSE}
+atime.list.3728 <- atime::atime_versions(
+  pkg.path=tdir,
+  pkg.edit.fun=function(old.Package, new.Package, sha, new.pkg.path){
+    pkg_find_replace <- function(glob, FIND, REPLACE){
+      atime::glob_find_replace(file.path(new.pkg.path, glob), FIND, REPLACE)
+    }
+    Package_regex <- gsub(".", "_?", old.Package, fixed=TRUE)
+    Package_ <- gsub(".", "_", old.Package, fixed=TRUE)
+    new.Package_ <- paste0(Package_, "_", sha)
+    pkg_find_replace(
+      "DESCRIPTION", 
+      paste0("Package:\\s+", old.Package),
+      paste("Package:", new.Package))
+    pkg_find_replace(
+      file.path("src","Makevars.*in"),
+      Package_regex,
+      new.Package_)
+    pkg_find_replace(
+      file.path("R", "onLoad.R"),
+      Package_regex,
+      new.Package_)
+    pkg_find_replace(
+      file.path("R", "onLoad.R"),
+      sprintf('packageVersion\\("%s"\\)', old.Package),
+      sprintf('packageVersion\\("%s"\\)', new.Package))
+    pkg_find_replace(
+      file.path("src", "init.c"),
+      paste0("R_init_", Package_regex),
+      paste0("R_init_", gsub("[.]", "_", new.Package_)))
+    pkg_find_replace(
+      "NAMESPACE",
+      sprintf('useDynLib\\("?%s"?', Package_regex),
+      paste0('useDynLib(', new.Package_))
+  },
+  N = seq(1, 366000, by = 100),
+  setDTthreads(2L),
+  setup={
+    set.seed(108)
+    n1 = sample(N, 30000, replace = TRUE)
+    d1=data.table(id1=paste0("id",sample(n1)), id2=paste0("id",sample(n1)), v1=n1)
+    d2=data.table(id1=paste0("id",sample(N)), id2=paste0("id",sample(N)), v2=N)
+  },
+  expr=data.table:::`[.data.table`(d2, , d1, v1 := i.v1, on=c("id1","id2")),
+  "Before"="8b201fd28f5d4afcc4be026a5d9eb4bb6dd62955",#https://github.com/Rdatatable/data.table/commit/8b201fd28f5d4afcc4be026a5d9eb4bb6dd62955
+  
+  "Regression"="86034855f9b305e948d83014af89352fc42e27f2",#https://github.com/Rdatatable/data.table/commit/86034855f9b305e948d83014af89352fc42e27f2
+  
+  "Fixed"="3bfe51ec74e26045836abd9c2e16144beeba8761") #https://github.com/Rdatatable/data.table/commit/3bfe51ec74e26045836abd9c2e16144beeba8761
+```
+
+  expr=data.table:::`[.data.table`(d2, , d1, v1 := i.v1, on=c("id1","id2")),
+  "Before"="8b201fd28f5d4afcc4be026a5d9eb4bb6dd62955",#https://github.com/Rdatatable/data.table/commit/8b201fd28f5d4afcc4be026a5d9eb4bb6dd62955
+
+  "Regression"="86034855f9b305e948d83014af89352fc42e27f2",#https://github.com/Rdatatable/data.table/commit/86034855f9b305e948d83014af89352fc42e27f2
+
+  "Fixed"="3bfe51ec74e26045836abd9c2e16144beeba8761") #https://github.com/Rdatatable/data.table/commit/3bfe51ec74e26045836abd9c2e16144beeba8761
+
+expr=data.table:::setkey(dt, x, verbose = TRUE),              "Before"="d59c486d80b1afb57fa898755f04b5f0809cb07f",
+  #https://github.com/Rdatatable/data.table/commit/d59c486d80b1afb57fa898755f04b5f0809cb07f
+  "Regression"="34796cd1524828df9bf13a174265cb68a09fcd77", #https://github.com/Rdatatable/data.table/commit/34796cd1524828df9bf13a174265cb68a09fcd77
+  "Fixed"="263b53e50241914a22f7ba6a139b52162c9d7927")#https://github.com/Rdatatable/data.table/commit/263b53e50241914a22f7ba6a139b52162c9d7927
+
+
+```{r}
+plot(atime.list.3928)+
+  labs(title = "join operation almost 2 times slower
+#3928")
+
+png("atime.list.3928.png")
+plot(atime.list.3928)+
+  labs(title = "join operation almost 2 times slower
+#3928")
+dev.off()
+```
+
+
+```
+

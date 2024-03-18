@@ -1,0 +1,181 @@
+---
+title: '[[ by group performance #4655'
+output: html_document
+date: "2024-02-15"
+---
+
+
+```{r}
+library(data.table)
+
+set.seed(123L)
+n = 500L
+n_nested = 40L
+dt = data.table(ordered_id = seq_len(n),
+                unordered_id = sample(n),
+                value = replicate(n, data.table(val1 = sample(n_nested)), simplify = FALSE))
+
+bench::mark(
+    dt[, value[[1L]], by = ordered_id]
+    , dt[, value[[1L]], by = unordered_id]
+    , check = FALSE
+    , time_unit = "ms" 
+)
+
+## pre-regression (1.12.8)
+
+##  expression                             min median `itr/sec` mem_alloc
+##  <bch:expr>                           <dbl>  <dbl>     <dbl> <bch:byt>
+##1 dt[, value[[1L]], by = ordered_id]   0.755  0.838     1131.     401KB
+##2 dt[, value[[1L]], by = unordered_id] 0.796  0.892     1033.     409KB
+
+## Post-regression (CRAN 1.13.0)
+
+#> # A tibble: 2 x 6
+#>   expression                               min  median `itr/sec` mem_alloc
+#>   <bch:expr>                             <dbl>   <dbl>     <dbl> <bch:byt>
+#> 1 dt[, value[[1L]], by = ordered_id]   102.    126.         8.02    53.7MB
+#> 2 dt[, value[[1L]], by = unordered_id]   0.630   0.669   1261.     409.2KB
+#> # ... with 1 more variable: `gc/sec` <dbl>
+
+## after patch
+
+##  expression                             min median `itr/sec` mem_alloc `gc/sec`
+##  <bch:expr>                           <dbl>  <dbl>     <dbl> <bch:byt>    <dbl>
+##1 dt[, value[[1L]], by = ordered_id]   0.634  0.691     1358.     401KB     15.0
+##2 dt[, value[[1L]], by = unordered_id] 0.651  0.778     1187.     409KB     12.8
+```
+
+
+```{r}
+library(atime)
+library(ggplot2)
+library(data.table)
+```
+
+
+```{r}
+
+  tdir <- tempfile()
+  dir.create(tdir)
+  git2r::clone("https://github.com/Rdatatable/data.table", tdir)
+  
+```
+
+
+```{r}
+
+atime.list.4655 <- atime::atime_versions(
+  pkg.path=tdir,
+  pkg.edit.fun=function(old.Package, new.Package, sha, new.pkg.path){
+    pkg_find_replace <- function(glob, FIND, REPLACE){
+      atime::glob_find_replace(file.path(new.pkg.path, glob), FIND, REPLACE)
+    }
+    Package_regex <- gsub(".", "_?", old.Package, fixed=TRUE)
+    Package_ <- gsub(".", "_", old.Package, fixed=TRUE)
+    new.Package_ <- paste0(Package_, "_", sha)
+    pkg_find_replace(
+      "DESCRIPTION", 
+      paste0("Package:\\s+", old.Package),
+      paste("Package:", new.Package))
+    pkg_find_replace(
+      file.path("src","Makevars.*in"),
+      Package_regex,
+      new.Package_)
+    pkg_find_replace(
+      file.path("R", "onLoad.R"),
+      Package_regex,
+      new.Package_)
+    pkg_find_replace(
+      file.path("R", "onLoad.R"),
+      sprintf('packageVersion\\("%s"\\)', old.Package),
+      sprintf('packageVersion\\("%s"\\)', new.Package))
+    pkg_find_replace(
+      file.path("src", "init.c"),
+      paste0("R_init_", Package_regex),
+      paste0("R_init_", gsub("[.]", "_", new.Package_)))
+    pkg_find_replace(
+      "NAMESPACE",
+      sprintf('useDynLib\\("?%s"?', Package_regex),
+      paste0('useDynLib(', new.Package_))
+  },
+  N=seq(10, 500, 100),
+  setup={ 
+    set.seed(123)
+    dt = data.table(ordered_id = seq_len(N),
+                    unordered_id = sample(N),
+                    value = replicate(N, data.table(val1 = sample(40)), simplify = FALSE))
+  },
+  
+  expr=data.table:::`[.data.table`(dt, , value[[1L]], by = unordered_id),
+  #"Before"="8c5042ca9aa5c6217b460fa5e8bf01003c7be358",#https://github.com/Rdatatable/data.table/commit/8c5042ca9aa5c6217b460fa5e8bf01003c7be358
+  "Regression"="06c43b102f4b97ec91cb14a0c1631f771a9a0414", #https://github.com/Rdatatable/data.table/tree/06c43b102f4b97ec91cb14a0c1631f771a9a0414
+  "Fixed"="a8ec94484d2cc375d8295a94bacc5353576c238a") #https://github.com/Rdatatable/data.table/commit/a8ec94484d2cc375d8295a94bacc5353576c238a
+```
+
+
+```{r}
+plot(atime.list.4655)+
+  labs(title = "
+[[ by group performance #4655")
+
+png("atime.list.4655.png")
+plot(atime.list.4655)+
+  labs(title = "
+[[ by group performance #4655")
+dev.off()
+
+```
+```
+
+
+atime.list.4655 <- atime::atime_versions(
+  pkg.path=tdir,
+  pkg.edit.fun=function(old.Package, new.Package, sha, new.pkg.path){
+    pkg_find_replace <- function(glob, FIND, REPLACE){
+      atime::glob_find_replace(file.path(new.pkg.path, glob), FIND, REPLACE)
+    }
+    Package_regex <- gsub(".", "_?", old.Package, fixed=TRUE)
+    Package_ <- gsub(".", "_", old.Package, fixed=TRUE)
+    new.Package_ <- paste0(Package_, "_", sha)
+    pkg_find_replace(
+      "DESCRIPTION", 
+      paste0("Package:\\s+", old.Package),
+      paste("Package:", new.Package))
+    pkg_find_replace(
+      file.path("src","Makevars.*in"),
+      Package_regex,
+      new.Package_)
+    pkg_find_replace(
+      file.path("R", "onLoad.R"),
+      Package_regex,
+      new.Package_)
+    pkg_find_replace(
+      file.path("R", "onLoad.R"),
+      sprintf('packageVersion\\("%s"\\)', old.Package),
+      sprintf('packageVersion\\("%s"\\)', new.Package))
+    pkg_find_replace(
+      file.path("src", "init.c"),
+      paste0("R_init_", Package_regex),
+      paste0("R_init_", gsub("[.]", "_", new.Package_)))
+    pkg_find_replace(
+      "NAMESPACE",
+      sprintf('useDynLib\\("?%s"?', Package_regex),
+      paste0('useDynLib(', new.Package_))
+  },
+  
+  N=seq(100, 500, 100),
+  setup={ 
+    set.seed(123)
+    dt = data.table(ordered_id = seq_len(N),
+                    unordered_id = sample(N),
+                    value = replicate(N, data.table(val1 = sample(40)), simplify = FALSE))
+  },
+  
+  expr=data.table:::`[.data.table`(dt, , value[[1L]], by = unordered_id),
+  "Before"="dadf52892ec66fe4861278eaeef0ef8d912e90ee",
+  "Regression"="f3470bce8d2097bb6b1e3a92b5e93169d97e1cad", 
+  "Fixed"="93967418ee0e40370ce9d4c4b63bf599e4ef1ecd") 
+
+https://github.com/Rdatatable/data.table/commit/f3470bce8d2097bb6b1e3a92b5e93169d97e1cad
+

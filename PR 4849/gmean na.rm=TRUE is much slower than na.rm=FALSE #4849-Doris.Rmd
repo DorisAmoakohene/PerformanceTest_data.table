@@ -1,0 +1,162 @@
+---
+title: 'gmean na.rm=TRUE is much slower than na.rm=FALSE #4849'
+author: "Doris Afriyie Amoakohene"
+date: "2024-02-14"
+output: html_document
+---
+
+gmean na.rm=TRUE is much slower than na.rm=FALSE #4849
+
+```{r}
+library(data.table) ## 1.13.5
+setDTthreads(0L) ## 40
+set.seed(108)
+N = 1e9L
+K = 1e2L
+DT = list()
+DT[["id3"]] = factor(sample(sprintf("id%010d",1:(N/K)), N, TRUE))
+DT[["v3"]] =  round(runif(N,max=100),6)
+setDT(DT)
+
+system.time(naf <- DT[, .(v3=mean(v3)), by=id3, verbose=TRUE])
+#Detected that j uses these columns: v3 
+#Finding groups using forderv ... forder.c received 1000000000 rows and 1 columns
+#5.615s elapsed (00:01:39 cpu) 
+#Finding group sizes from the positions (can be avoided to save RAM) ... 0.091s elapsed (0.074s cpu) 
+#Getting back original order ... forder.c received a vector type 'integer' length 10000000
+#1.037s elapsed (2.888s cpu) 
+#lapply optimization is on, j unchanged as 'list(mean(v3))'
+#GForce optimized j to 'list(gmean(v3))'
+#Making each group and running j (GForce TRUE) ... gforce initial population of grp took 0.319
+#gforce assign high and low took 4.399
+#This gsum took (narm=FALSE) ... gather took ... 2.107s
+#2.322s
+#gforce eval took 2.339
+#8.738s elapsed (00:02:39 cpu) 
+#
+#   user  system elapsed 
+#261.852  67.723  15.498 
+
+system.time(nat <- DT[, .(v3=mean(v3, na.rm=TRUE)), by=id3, verbose=TRUE])
+#Detected that j uses these columns: v3 
+#Finding groups using forderv ... forder.c received 1000000000 rows and 1 columns
+#5.799s elapsed (00:01:42 cpu) 
+#Finding group sizes from the positions (can be avoided to save RAM) ... 0.090s elapsed (0.074s cpu) 
+#Getting back original order ... forder.c received a vector type 'integer' length 10000000
+#2.608s elapsed (3.275s cpu) 
+#lapply optimization is on, j unchanged as 'list(mean(v3, na.rm = TRUE))'
+#GForce optimized j to 'list(gmean(v3, na.rm = TRUE))'
+#Making each group and running j (GForce TRUE) ... gforce initial population of grp took 0.346
+#gforce assign high and low took 4.978
+#gforce eval took 33.515
+#40.2s elapsed (00:02:24 cpu) 
+#
+#   user  system elapsed 
+#250.858  68.804  48.679
+```
+
+
+```{r}
+
+
+library(atime)
+library(ggplot2)
+library(data.table)
+
+```
+
+```{r}
+  tdir <- tempfile()
+  dir.create(tdir)
+  git2r::clone("https://github.com/Rdatatable/data.table", tdir)
+  
+```
+```{r}
+ tdir <- C:/Users/amoak/ data.table
+```
+
+
+```{r}
+
+atime.list.4851 <- atime::atime_versions(
+pkg.path=tdir,
+pkg.edit.fun=function(old.Package, new.Package, sha, new.pkg.path){
+      pkg_find_replace <- function(glob, FIND, REPLACE){
+        atime::glob_find_replace(file.path(new.pkg.path, glob), FIND, REPLACE)
+      }
+      Package_regex <- gsub(".", "_?", old.Package, fixed=TRUE)
+      Package_ <- gsub(".", "_", old.Package, fixed=TRUE)
+      new.Package_ <- paste0(Package_, "_", sha)
+      pkg_find_replace(
+        "DESCRIPTION", 
+        paste0("Package:\\s+", old.Package),
+        paste("Package:", new.Package))
+      pkg_find_replace(
+        file.path("src","Makevars.*in"),
+        Package_regex,
+        new.Package_)
+      pkg_find_replace(
+        file.path("R", "onLoad.R"),
+        Package_regex,
+        new.Package_)
+      pkg_find_replace(
+        file.path("R", "onLoad.R"),
+        sprintf('packageVersion\\("%s"\\)', old.Package),
+        sprintf('packageVersion\\("%s"\\)', new.Package))
+      pkg_find_replace(
+        file.path("src", "init.c"),
+        paste0("R_init_", Package_regex),
+        paste0("R_init_", gsub("[.]", "_", new.Package_)))
+      pkg_find_replace(
+        "NAMESPACE",
+        sprintf('useDynLib\\("?%s"?', Package_regex),
+        paste0('useDynLib(', new.Package_))
+    },
+
+N=1e9L,
+setup={
+  K = 1e2L
+  setDTthreads(0L)
+  set.seed(108)
+  DT = list()
+  DT[["id3"]] = factor(sample(sprintf("id%010d",1:(N/K)), N, TRUE))
+  
+  DT[["v3"]] =  round(runif(N,max=100),6)
+  setDT(DT)
+  },
+  expr=data.table:::`[.data.table`(DT, , .(v3=mean(v3, na.rm=TRUE)), by=id3, verbose=TRUE),
+"Before"="7aa22ee6b245b9308352acd66384373a99376c13",#https://github.com/Rdatatable/data.table/tree/7aa22ee6b245b9308352acd66384373a99376c13
+  "Regression"="788c585586798107f9eeb3263928f718ca1db81e", #https://github.com/Rdatatable/data.table/tree/788c585586798107f9eeb3263928f718ca1db81e
+  "Fixed"="ec1259af1bf13fc0c96a1d3f9e84d55d8106a9a4")#https://github.com/Rdatatable/data.table/tree/ec1259af1bf13fc0c96a1d3f9e84d55d8106a9a4
+```
+
+
+
+pdf("atime.list.4851.pdf")
+plot(atime.list.4851)
+dev.off()
+
+
+
+```{r}
+plot(atime.list.4851)+
+  labs(title = "gmean na.rm=TRUE is much slower than na.rm=FALSE #4849")
+
+png("atime.list.4851.png")
+plot(atime.list.4851)+
+  labs(title = "gmean na.rm=TRUE is much slower than na.rm=FALSE #4849")
+dev.off()
+
+```
+
+library(data.table) ## 1.13.5
+setDTthreads(0L) ## 40
+set.seed(108)
+N = 1e9L
+K = 1e2L
+DT = list()
+DT[["id3"]] = factor(sample(sprintf("id%010d",1:(N/K)), N, TRUE))
+DT[["v3"]] =  round(runif(N,max=100),6)
+setDT(DT)
+
+system.time(naf <- DT[, .(v3=mean(v3)), by=id3, verbose=TRUE])
