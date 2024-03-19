@@ -5,19 +5,6 @@ date: "2024-02-02"
 ---
 
 
-library(data.table)
-allIterations <- data.frame(v1 = runif(1e5), v2 = runif(1e5))
-DoSomething <- function(row) someCalculation <- row[["v1"]] + 1
-system.time(for (r in 1:nrow(allIterations)) DoSomething(allIterations[r, ]))
-#   user  system elapsed 
-#  3.384   0.007   3.392
-allIterations <- as.data.table(allIterations)
-setDTthreads(1)
-system.time(for (r in 1:nrow(allIterations)) DoSomething(allIterations[r, , with=c(i=FALSE)]))
-#   user  system elapsed 
-#  5.432   0.121   5.554 
-
-
 
 ```{r}
 allIterations <- data.frame(v1 = runif(1e5), v2 = runif(1e5))
@@ -107,21 +94,24 @@ atime.list.3735 <- atime::atime_versions(
     DoSomething <- function(row) {
       someCalculation <- row[["v1"]] + 1
       }
-      allIterations <- as.data.table(allIterations)
+      allIteration_dt <- as.data.table(allIterations)
       setDTthreads(1)
       
     },
   expr=data.table:::`[.data.table`({
-    for (r in 1:nrow(allIterations)) {
-      DoSomething(allIterations[r, ])
+    for (r in 1:nrow(allIteration_dt)) {
+      DoSomething(allIteration_dt[r, ])
     }
   }),
-  "master"="6f43a96ad478e02a48f61939e0c0d3047e949353",#https://github.com/Rdatatable/data.table/tree/6f43a96ad478e02a48f61939e0c0d3047e949353
-  "PR4488"="45952d1619365a4624d939575a934583c33c8fbb")#https://github.com/Rdatatable/data.table/pull/4488/commits/c33e98bb0a2f919bc1b428a5b7985f45f9d88a77 
+  "Before"="469b9ebe16adabd5f7c68c2727f19c83fd444e43",
+  "Regression"="c33e98bb0a2f919bc1b428a5b7985f45f9d88a77",
+  "fixed"="958e3dd3cba7c259220aa653bef4beb8ad74b239")
 ```
 
 
+
 ```{r}
+png()
 plot(atime.list.3735)+
   labs(title = "Selecting from data.table by row is very slow #3735")
 

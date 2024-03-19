@@ -1,0 +1,87 @@
+---
+title: "Teach forder to re-use existing key and index attributes instead of sorting from scratch #4386"
+author: "Doris Amoakohene"
+date: "2024-03-15"
+output: html_document
+---
+
+
+
+```{r}
+
+library(atime)
+library(ggplot2)
+library(data.table)
+
+```
+
+```{r}
+  tdir <- tempfile()
+  dir.create(tdir)
+  git2r::clone("https://github.com/Rdatatable/data.table", tdir)
+  
+```
+
+
+```{r}
+
+PR_4386 <- atime::atime_versions(
+pkg.path=tdir,
+pkg.edit.fun=function(old.Package, new.Package, sha, new.pkg.path){
+      pkg_find_replace <- function(glob, FIND, REPLACE){
+        atime::glob_find_replace(file.path(new.pkg.path, glob), FIND, REPLACE)
+      }
+      Package_regex <- gsub(".", "_?", old.Package, fixed=TRUE)
+      Package_ <- gsub(".", "_", old.Package, fixed=TRUE)
+      new.Package_ <- paste0(Package_, "_", sha)
+      pkg_find_replace(
+        "DESCRIPTION", 
+        paste0("Package:\\s+", old.Package),
+        paste("Package:", new.Package))
+      pkg_find_replace(
+        file.path("src","Makevars.*in"),
+        Package_regex,
+        new.Package_)
+      pkg_find_replace(
+        file.path("R", "onLoad.R"),
+        Package_regex,
+        new.Package_)
+      pkg_find_replace(
+        file.path("R", "onLoad.R"),
+        sprintf('packageVersion\\("%s"\\)', old.Package),
+        sprintf('packageVersion\\("%s"\\)', new.Package))
+      pkg_find_replace(
+        file.path("src", "init.c"),
+        paste0("R_init_", Package_regex),
+        paste0("R_init_", gsub("[.]", "_", new.Package_)))
+      pkg_find_replace(
+        "NAMESPACE",
+        sprintf('useDynLib\\("?%s"?', Package_regex),
+        paste0('useDynLib(', new.Package_))
+    },
+
+  N=10^seq(1,20),
+  setup={ 
+    set.seed(108)
+    d <- data.table(
+      id3 = sample(c(seq.int(N*0.9), sample(N*0.9, N*0.1, TRUE))),
+      v1 = sample(5L, N, TRUE),
+      v2 = sample(5L, N, TRUE))
+  },
+
+  expr=data.table:::`[.data.table`(d, , (max(v1)-min(v2)), by = id3),
+"Before"="15f0598b9828d3af2eb8ddc9b38e0356f42afe4f",
+"Fixed"="8bf5b5c4afa8e8fac8d55bcbd131463a80bb49fd")#https://github.com/Rdatatable/data.table/pull/4386/commits/8bf5b5c4afa8e8fac8d55bcbd131463a80bb49fd
+```
+
+
+```{r}
+plot(PR_4386)+
+  labs(title = "Teach forder to re-use existing key and index attributes instead of sorting from scratch #4386")
+
+png("PR_4386.png")
+plot(PR_4386)+
+  labs(title = "Teach forder to re-use existing key and index attributes instead of sorting from scratch #4386")
+dev.off()
+
+```

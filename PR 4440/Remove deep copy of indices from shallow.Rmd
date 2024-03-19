@@ -64,7 +64,7 @@ pkg.edit.fun=function(old.Package, new.Package, sha, new.pkg.path){
         sprintf('useDynLib\\("?%s"?', Package_regex),
         paste0('useDynLib(', new.Package_))
     },
-#https://github.com/Rdatatable/data.table/pull/4440#issuecomment-632842980
+
   N= 10^seq(3,8),
   setup={
     set.seed(1L)
@@ -72,16 +72,17 @@ pkg.edit.fun=function(old.Package, new.Package, sha, new.pkg.path){
       a=sample(N,N))
     setindex(dt, a)
   },
-# dt2 <- shallow(dt1)
+
   expr=data.table:::shallow(dt),
-  "Before"="ad7b67c80a551b7a1e2ef8b73d6162ed7737c934",
-#https://github.com/Rdatatable/data.table/commit/ad7b67c80a551b7a1e2ef8b73d6162ed7737c934
-  "Regression"="752012f577f8e268bb6d0084ca39a09fa7fbc1c4", 
+  #"Before"="793f8545c363d222de18ac892bc7abb80154e724",
+#https://github.com/tlapak/data.table/commit/89830e97b1582c1f4603b6b8f0260e0945876a27
+  "Regression"="dd7609e83132e19c9be80d71c73e8a8f95e19b27", 
 #https://github.com/Rdatatable/data.table/tree/752012f577f8e268bb6d0084ca39a09fa7fbc1c4
   "Fixed"="9d3b9202fddb980345025a4f6ac451ed26a423be")#https://github.com/Rdatatable/data.table/commit/9d3b9202fddb980345025a4f6ac451ed26a423be 
 
 
 ```
+
 
 Remove deep copy of indices from shallow() #4440
 ```{r}
@@ -94,6 +95,56 @@ plot(atime.list.4440)+
 dev.off()
 
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ```{r}
@@ -148,7 +199,7 @@ pkg.edit.fun=function(old.Package, new.Package, sha, new.pkg.path){
   },
   "Before"="ad7b67c80a551b7a1e2ef8b73d6162ed7737c934",
 #https://github.com/Rdatatable/data.table/commit/ad7b67c80a551b7a1e2ef8b73d6162ed7737c934
-  "Regression"="752012f577f8e268bb6d0084ca39a09fa7fbc1c4", 
+  "Regression"="dd7609e83132e19c9be80d71c73e8a8f95e19b27", 
 #https://github.com/Rdatatable/data.table/tree/752012f577f8e268bb6d0084ca39a09fa7fbc1c4
   "Fixed"="9d3b9202fddb980345025a4f6ac451ed26a423be")#https://github.com/Rdatatable/data.table/commit/9d3b9202fddb980345025a4f6ac451ed26a423be 
 ```

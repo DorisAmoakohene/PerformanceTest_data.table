@@ -88,15 +88,14 @@ atime.list.1534 <- atime::atime_versions(
       sprintf('useDynLib\\("?%s"?', Package_regex),
       paste0('useDynLib(', new.Package_))
   },
-  #https://github.com/Rdatatable/data.table/issues/4200#issuecomment-578629820, link to the setup code
+
   N=10^seq(1,7),
   setup={ 
     DT = data.table(x = sample(N), y = sample(1e2,N,TRUE))
   },
-  #system.time(d[, max(v1)-min(v2), by=id3])
   expr=data.table:::`[.data.table`(DT,, shift(x, 1, type="lag"), y),
-  "Before"="9e6e45301ea89227414a4f6df1ffc679c5c7ef1c",#https://github.com/Rdatatable/data.table/commit/9e6e45301ea89227414a4f6df1ffc679c5c7ef1c
-  "Regression"="cd818080606591ac5348005732db0cadfb4e597c", #https://github.com/Rdatatable/data.table/commit/cd818080606591ac5348005732db0cadfb4e597c
+  "Before"="4eada9760352d243896628ecaf61ec934338dc3b",#https://github.com/Rdatatable/data.table/commit/9e6e45301ea89227414a4f6df1ffc679c5c7ef1c
+  "Regression"="9e6e45301ea89227414a4f6df1ffc679c5c7ef1c", #https://github.com/Rdatatable/data.table/commit/cd818080606591ac5348005732db0cadfb4e597c
   "Fixed"="e88826e94127991754a8821ac8149d15f1f9c3c2")#https://github.com/Rdatatable/data.table/commit/e88826e94127991754a8821ac8149d15f1f9c3c2
 ```
 
