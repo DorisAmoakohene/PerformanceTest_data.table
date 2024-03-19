@@ -83,14 +83,14 @@ D. [Link to my atime code showing this Regression](https://github.com/DorisAmoak
 ![Plot showing the 3 branches(Regression,Fixed and Before) of the issues#4440](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/PR%204440/atime.list.4440.png)
 
 # 4.
-A.
+A. [The user mentions that the shift() function in data.table version 1.9.6 is slow when applied to many groups](https://github.com/Rdatatable/data.table/issues/1534). 
 
-B.
+B.The exact cause or specific use case is not elaborated upon in the issue.[visit here to read more](https://github.com/Rdatatable/data.table/issues/1534)
 
-C.
+C.[The pull request address the issue by allowing GForce optimization for lapply even without using .SD1.](https://github.com/Rdatatable/data.table/pull/5205)
 
 D. [This is the link to my atime code](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/PR%204655/%5B%5B%20by%20group%20performance%20%234655.Rmd)
 
-![Plot showing the the memory and time metrics of the issue from the atime]()
+![Plot showing the the memory and time metrics of the issue from the atime](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/PR%201534/atime.list.1534.png)
 
 
