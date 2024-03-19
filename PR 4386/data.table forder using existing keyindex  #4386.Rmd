@@ -62,16 +62,14 @@ pkg.edit.fun=function(old.Package, new.Package, sha, new.pkg.path){
 
   N=10^seq(1,20),
   setup={ 
-    set.seed(108)
-    d <- data.table(
-      id3 = sample(c(seq.int(N*0.9), sample(N*0.9, N*0.1, TRUE))),
-      v1 = sample(5L, N, TRUE),
-      v2 = sample(5L, N, TRUE))
+    options(datatable.verbose=TRUE, datatable.forder.auto.index=TRUE)
+    d2 = data.table(id=N, v2=N)
+    o = forderv(d2, "id")
   },
 
-  expr=data.table:::`[.data.table`(d, , (max(v1)-min(v2)), by = id3),
-"Before"="15f0598b9828d3af2eb8ddc9b38e0356f42afe4f",
-"Fixed"="8bf5b5c4afa8e8fac8d55bcbd131463a80bb49fd")#https://github.com/Rdatatable/data.table/pull/4386/commits/8bf5b5c4afa8e8fac8d55bcbd131463a80bb49fd
+  expr=data.table::: forderv(d2, "id", retGrp=TRUE),
+"Before"="b0efcf59442a7d086c6df17fa6a45c81b082322e",
+"Fixed"="8bf5b5c4afa8e8fac8d55bcbd131463a80bb49fd")
 ```
 
 
