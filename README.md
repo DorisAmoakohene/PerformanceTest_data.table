@@ -47,7 +47,7 @@ These issues address performance-related concerns and propose potential fixes or
    D.
    [link to my atime code](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/PR%205424/Performance%20regression%20with%235424.Rmd)
 
-   ![Plot showing the 3 branches(Regression,Fixed and Before) of Issue#5424]()
+   ![Plot showing the 3 branches(Regression,Fixed and Before) of Issue#5424](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/PR%205424/atime.list.png)
 
    ![Plot showing the 3 branches(Regression,Fixed and Before) of Issues5366](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/PR%205424/atime.list.2.png)
    
