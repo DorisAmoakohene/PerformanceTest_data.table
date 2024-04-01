@@ -26,6 +26,12 @@ D. Provide links to your atime test code(s) and plot(s) that illustrate the perf
 R atime code file(s)
 png atime figure file(s)
 
+To ensure that a particular test is working correctly and that the plot is accurate, you should verify the following:
+
+1. The graph should exhibit an increasing trend, either by a factor of N or linearly. However, there may be special cases where the graph remains stagnant, as demonstrated in example 3.
+2. The "Before" and "Fixed" data points should either have the same movement or show faster progress compared to the "Regression" data point.
+
+
 
 # Performance Regression Analysis
 
