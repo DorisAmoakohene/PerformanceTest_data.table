@@ -1,17 +1,17 @@
 # Performance Regression Analysis in the data.table Package
 ## Description:
-This repository aims to investigate performance regressions in the data.table package, creating relevant performance tests, and using atime to analyze the performance of different commits (before regression, regression, fix regression). 
+This repository aims to investigate performance regressions in the data.table package, creating relevant performance tests, and using atime to analyze the performance of different data.table versions (before regression, regression, fix regression). 
 
 ## To Start:
-To begin, conduct the atime test for the different commits (before regression, regression, fix regression) to identify potential performance issues.
+To begin, conduct the atime test for the different data.table versions (before regression, regression, fix regression) to identify potential performance issues.
 NB: Set up the necessary environment and dependencies, ensuring that the data.table package and the atime package are installed and loaded.
 
 Generate a plot to showcase the fixes made in the data.table package using the atime package. Utilize the atime_versions function to track the fixes across different versions of the package. 
-Pass the following named arguments to atime::atime_versions: N, setup, expr, and the different commits. More documentation of the atime package can be found here. The documentation provides detailed information on how to use the atime package for performance analysis and tracking changes across different versions.
+Pass the following named arguments to atime::atime_versions: N, setup, expr, and the different versions. More documentation of the atime package can be found [here](https://github.com/tdhock/atime). The documentation provides detailed information on how to use the atime package for performance analysis and tracking changes across different versions.
 
 Use the plot function to visually represent the execution times of the expression evaluated across different versions of the data.table package.
 
-To understand more on how to perform an data.table performance test and create a new test, read this blog.
+To understand more on how to perform an data.table performance test and create a new test, read this [blog]().
 
 ## Each of the examples below will be categorized using the labels A, B, C, and D.
 
