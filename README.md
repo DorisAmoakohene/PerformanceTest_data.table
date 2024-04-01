@@ -11,6 +11,8 @@ Pass the following named arguments to atime::atime_versions: N, setup, expr, and
 
 Use the plot function to visually represent the execution times of the expression evaluated across different versions of the data.table package.
 
+To understand more on how to perform an data.table performance test and create a new test, read this blog.
+
 ## Each of the examples below will be categorized using the labels A, B, C, and D.
 
 A. Provide links to the issue(s) comment(s) containing the original code(s) that reported the regression. If there are multiple issues with code exhibiting the regression, include links to each issue along with a summary of the observed symptoms in your own words.
