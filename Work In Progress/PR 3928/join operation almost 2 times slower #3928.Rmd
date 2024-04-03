@@ -5,7 +5,8 @@ output: html_document
 date: "2024-02-19"
 ---
 
-Low performance of setkey function for version 1.12.0 and later #4788
+attributed to this regression, Low performance of setkey function for version 1.12.0 and later #4788
+still an issue
 
 ```{r}
 
@@ -81,24 +82,13 @@ atime.list.3728 <- atime::atime_versions(
     d2=data.table(id1=paste0("id",sample(N)), id2=paste0("id",sample(N)), v2=N)
   },
   expr=data.table:::`[.data.table`(d2, , d1, v1 := i.v1, on=c("id1","id2")),
-  "Before"="8b201fd28f5d4afcc4be026a5d9eb4bb6dd62955",#https://github.com/Rdatatable/data.table/commit/8b201fd28f5d4afcc4be026a5d9eb4bb6dd62955
+  "Before"="",
   
-  "Regression"="86034855f9b305e948d83014af89352fc42e27f2",#https://github.com/Rdatatable/data.table/commit/86034855f9b305e948d83014af89352fc42e27f2
+  "Regression"="",
   
-  "Fixed"="3bfe51ec74e26045836abd9c2e16144beeba8761") #https://github.com/Rdatatable/data.table/commit/3bfe51ec74e26045836abd9c2e16144beeba8761
+  "Fixed"="") 
 ```
 
-  expr=data.table:::`[.data.table`(d2, , d1, v1 := i.v1, on=c("id1","id2")),
-  "Before"="8b201fd28f5d4afcc4be026a5d9eb4bb6dd62955",#https://github.com/Rdatatable/data.table/commit/8b201fd28f5d4afcc4be026a5d9eb4bb6dd62955
-
-  "Regression"="86034855f9b305e948d83014af89352fc42e27f2",#https://github.com/Rdatatable/data.table/commit/86034855f9b305e948d83014af89352fc42e27f2
-
-  "Fixed"="3bfe51ec74e26045836abd9c2e16144beeba8761") #https://github.com/Rdatatable/data.table/commit/3bfe51ec74e26045836abd9c2e16144beeba8761
-
-expr=data.table:::setkey(dt, x, verbose = TRUE),              "Before"="d59c486d80b1afb57fa898755f04b5f0809cb07f",
-  #https://github.com/Rdatatable/data.table/commit/d59c486d80b1afb57fa898755f04b5f0809cb07f
-  "Regression"="34796cd1524828df9bf13a174265cb68a09fcd77", #https://github.com/Rdatatable/data.table/commit/34796cd1524828df9bf13a174265cb68a09fcd77
-  "Fixed"="263b53e50241914a22f7ba6a139b52162c9d7927")#https://github.com/Rdatatable/data.table/commit/263b53e50241914a22f7ba6a139b52162c9d7927
 
 
 ```{r}
