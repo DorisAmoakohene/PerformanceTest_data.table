@@ -81,9 +81,9 @@ atime.list.4849 <- atime::atime_versions(
     setDT(DT)
   },
   expr= data.table:::`[.data.table`(DT,, .(v3=mean(v3)), by=id3, verbose=TRUE),
-  "Before"="616dfc5093b0f7eea6aafbc1ecc744a541088b12",#https://github.com/Rdatatable/data.table/tree/616dfc5093b0f7eea6aafbc1ecc744a541088b12
-  "Regression"="3ca0dbfb26c59b047acd6b0c5b400b6222ad6f6b",#https://github.com/Rdatatable/data.table/pull/4851/commits/3ca0dbfb26c59b047acd6b0c5b400b6222ad6f6b
-  "fixed"="3bfe51ec74e26045836abd9c2e16144beeba8761")#https://github.com/Rdatatable/data.table/commit/3bfe51ec74e26045836abd9c2e16144beeba8761
+  #"Before"="",
+  "Regression"="267315d4e585462c3dde3e5bbd7ac1f193ce4377",#parent of the first commit in the PR (https://github.com/Rdatatable/data.table/pull/4851/commits/) that fixes the issue (https://github.com/Rdatatable/data.table/commit/3ca0dbfb26c59b047acd6b0c5b400b6222ad6f6b)
+  "fixed"="56b92e1aa7819a2f677d0e664d8fe5bee85a8a5f")#This commit is the second commit in the PR that fixes the issue (https://github.com/Rdatatable/data.table/pull/4851/commits/)
 ```
 
 
