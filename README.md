@@ -47,11 +47,11 @@ These issues address performance-related concerns and propose potential fixes or
    [Fixes Regression](https://github.com/Rdatatable/data.table/commit/e793f53466d99f86e70fc2611b708ae8c601a451)
 
    D.
-   [link to my atime code](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/PR%205424/Performance%20regression%20with%235424.Rmd)
+   [link to my atime code](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/Working%20Examples/PR%205424/Performance%20regression%20with%235424.Rmd)
 
-   ![Plot showing the 3 branches(Regression,Fixed and Before) of Issue#5424](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/PR%205424/atime.list.png)
+   ![Plot showing the 3 branches(Regression,Fixed and Before) of Issue#5424](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/Working%20Examples/PR%205424/atime.list.png)
 
-   ![Plot showing the 3 branches(Regression,Fixed and Before) of Issues5366](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/PR%205424/atime.list.2.png)
+   ![Plot showing the 3 branches(Regression,Fixed and Before) of Issues5366](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/Working%20Examples/PR%205424/atime.list.2.png)
    
    ![Plot showing the 3 branches(Regression,Fixed and Before) of Issues5371]()
 
@@ -67,9 +67,9 @@ C. Fixed:
 [The regression was fixed Regression by the addition of const int nth = getDTthreads]( https://github.com/Rdatatable/data.table/pull/4558/files)
 
 D.
-[link to my atime code](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/PR%204200/groupby%20with%20dogroups%20(R%20expression)%20performance%20regression%20%234200.Rmd)
+[link to my atime code](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/Working%20Examples/PR%204200/groupby%20with%20dogroups%20(R%20expression)%20performance%20regression%20%234200.Rmd)
 
-![Plot showing the 3 branches(Regression,Fixed and Before) of the issues#4200](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/PR%204200/atime.list.4200.png)
+![Plot showing the 3 branches(Regression,Fixed and Before) of the issues#4200](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/Working%20Examples/PR%204200/atime.list.4200.png)
 
 
 # 3.
@@ -80,9 +80,9 @@ B. [Causes Regression](https://github.com/Rdatatable/data.table/issues/4311
 
 C. [Fixes Regression by passing shallow(dt.s4) to the isS4() function](https://github.com/Rdatatable/data.table/pull/4440)
 
-D. [Link to my atime code showing this Regression](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/PR%204440/Remove%20deep%20copy%20of%20indices%20from%20shallow.Rmd)
+D. [Link to my atime code showing this Regression](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/Working%20Examples/PR%204440/Remove%20deep%20copy%20of%20indices%20from%20shallow.Rmd)
 
-![Plot showing the 3 branches(Regression,Fixed and Before) of the issues#4440](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/PR%204440/atime.list.4440.png)
+![Plot showing the 3 branches(Regression,Fixed and Before) of the issues#4440](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/Working%20Examples/PR%204440/atime.list.4440.png)
 
 # 4.
 A. [The user mentions that the shift() function in data.table version 1.9.6 is slow when applied to many groups](https://github.com/Rdatatable/data.table/issues/1534). 
@@ -91,8 +91,27 @@ B.The exact cause or specific use case is not elaborated upon in the issue.[visi
 
 C.[The pull request address the issue by allowing GForce optimization for lapply even without using .SD1.](https://github.com/Rdatatable/data.table/pull/5205)
 
-D. [This is the link to my atime code](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/PR%204655/%5B%5B%20by%20group%20performance%20%234655.Rmd)
+D. [This is the link to my atime code](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/Working%20Examples/PR%201534/shift%20in%20data.table%20v1.9.6%20is%20slow%20for%20many%20groups%20%231534%20-%20Copy.Rmd)
 
-![Plot showing the the memory and time metrics of the issue from the atime](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/PR%201534/atime.list.1534.png)
+![Plot showing the the memory and time metrics of the issue from the atime](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/Working%20Examples/PR%201534/atime.list.1534.png)
 
 
+# 5
+D. [This is the link to my atime code](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/Working%20Examples/PR%204488/Selecting%20from%20data.table%20by%20row%20is%20very%20slow%20%233735%20-%20Copy.Rmd)
+
+![Plot showing the the memory and time metrics of the issue from the atime](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/Working%20Examples/PR%204488/atime.list.3735.png)
+
+# 6
+D. [This is the link to my atime code](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/Working%20Examples/PR%205427/setDT%20extremely%20slow%20for%20very%20wide%20input%20%235426%20-%20Copy.Rmd)
+
+![Plot showing the the memory and time metrics of the issue from the atime](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/Working%20Examples/PR%205427/atime.list.5427.png)
+
+# 7
+D. [This is the link to my atime code](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/Working%20Examples/PR%204655/%5B%5B%20by%20group%20performance%20%234655.Rmd)
+
+![Plot showing the the memory and time metrics of the issue from the atime](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/Working%20Examples/PR%204655/atime.list.4646.png)
+
+
+This issue is related the the above grph and was fixed by the same PR
+
+![Plot showing the the memory and time metrics of the issue from the atime](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/Working%20Examples/PR%204655/atime.list.4655.png)
