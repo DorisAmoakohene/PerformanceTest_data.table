@@ -32,33 +32,33 @@ atime.list.4646 <- atime::atime_versions(
     pkg_find_replace <- function(glob, FIND, REPLACE){
       atime::glob_find_replace(file.path(new.pkg.path, glob), FIND, REPLACE)
     }
-    Package_regex <- gsub(".", "_?", old.Package, fixed=TRUE)
+  Package_regex <- gsub(".", "_?", old.Package, fixed=TRUE)
     Package_ <- gsub(".", "_", old.Package, fixed=TRUE)
     new.Package_ <- paste0(Package_, "_", sha)
     pkg_find_replace(
-      "DESCRIPTION", 
+      "DESCRIPTION",
       paste0("Package:\\s+", old.Package),
       paste("Package:", new.Package))
-    pkg_find_replace(
-      file.path("src","Makevars.*in"),
-      Package_regex,
-      new.Package_)
-    pkg_find_replace(
-      file.path("R", "onLoad.R"),
-      Package_regex,
-      new.Package_)
-    pkg_find_replace(
-      file.path("R", "onLoad.R"),
-      sprintf('packageVersion\\("%s"\\)', old.Package),
-      sprintf('packageVersion\\("%s"\\)', new.Package))
-    pkg_find_replace(
-      file.path("src", "init.c"),
-      paste0("R_init_", Package_regex),
-      paste0("R_init_", gsub("[.]", "_", new.Package_)))
-    pkg_find_replace(
-      "NAMESPACE",
-      sprintf('useDynLib\\("?%s"?', Package_regex),
-      paste0('useDynLib(', new.Package_))
+  pkg_find_replace(
+    file.path("src","Makevars.*in"),
+    Package_regex,
+    new.Package_)
+  pkg_find_replace(
+    file.path("R", "onLoad.R"),
+    Package_regex,
+    new.Package_)
+  pkg_find_replace(
+    file.path("R", "onLoad.R"),
+    sprintf('packageVersion\\("%s"\\)', old.Package),
+    sprintf('packageVersion\\("%s"\\)', new.Package))
+  pkg_find_replace(
+    file.path("src", "init.c"),
+    paste0("R_init_", Package_regex),
+    paste0("R_init_", gsub("[.]", "_", new.Package_)))
+  pkg_find_replace(
+    "NAMESPACE",
+    sprintf('useDynLib\\("?%s"?', Package_regex),
+    paste0('useDynLib(', new.Package_))
   },
   N=10^seq(1,7),
   setup={ 
@@ -69,8 +69,8 @@ atime.list.4646 <- atime::atime_versions(
   
   expr=data.table:::`[.data.table`(dt, , value[[1L]], by = id),
   #"Before"="e0140eafa07ad39a7ac9d67737cc43c4c95ca935",#This is the commit tag 1.12.8(https://github.com/Rdatatable/data.table/tags)
-  "Regression"="db618444a4d16b91cccf35d80fa3f306739dd571", #parent of the first commit in the PR that fixes the issue(https://github.com/Rdatatable/data.table/pull/4655/commits)
-  "Fixed"="ec041f78691f9f9495c0f25b78109cd3f5295f4f") #This is the last commit in the PR that fixes the issue (https://github.com/Rdatatable/data.table/pull/4655/commits)
+  "slow"="db618444a4d16b91cccf35d80fa3f306739dd571", #parent of the first commit in the PR that fixes the issue(https://github.com/Rdatatable/data.table/pull/4655/commits)
+  "Fast"="ec041f78691f9f9495c0f25b78109cd3f5295f4f") #This is the last commit in the PR that fixes the issue (https://github.com/Rdatatable/data.table/pull/4655/commits)
 ```
 
 
@@ -139,8 +139,8 @@ atime.list.4658 <- atime::atime_versions(
   , times = 10
   , unit = 'ms'),
   #"Before"="e0140eafa07ad39a7ac9d67737cc43c4c95ca935",#This is the commit tag 1.12.8(https://github.com/Rdatatable/data.table/tags)
-  "Regression"="db618444a4d16b91cccf35d80fa3f306739dd571", #parent of the first commit in the PR that fixes the issue(https://github.com/Rdatatable/data.table/pull/4655/commits)
-  "Fixed"="ec041f78691f9f9495c0f25b78109cd3f5295f4f") #This is the last commit in the PR that fixes the issue (https://github.com/Rdatatable/data.table/pull/4655/commits)
+  "slow"="db618444a4d16b91cccf35d80fa3f306739dd571", #parent of the first commit in the PR that fixes the issue(https://github.com/Rdatatable/data.table/pull/4655/commits)
+  "Fast"="ec041f78691f9f9495c0f25b78109cd3f5295f4f") #This is the last commit in the PR that fixes the issue (https://github.com/Rdatatable/data.table/pull/4655/commits)
 ```
 
 ```{r}
@@ -191,7 +191,7 @@ atime.list.4655 <- atime::atime_versions(
       sprintf('useDynLib\\("?%s"?', Package_regex),
       paste0('useDynLib(', new.Package_))
   },
-  N=seq(10, 500, 100),
+  N=10^seq(1,7),
   setup={ 
     set.seed(123)
     dt = data.table(ordered_id = seq_len(N),
@@ -199,10 +199,10 @@ atime.list.4655 <- atime::atime_versions(
                     value = replicate(N, data.table(val1 = sample(40)), simplify = FALSE))
   },
   
-  expr=data.table:::`[.data.table`(dt, , value[[1L]], by = unordered_id),
+  expr=data.table:::`[.data.table`(dt, , value[[1L]], by = ordered_id),
   #"Before"="e0140eafa07ad39a7ac9d67737cc43c4c95ca935",#This is the commit tag 1.12.8(https://github.com/Rdatatable/data.table/tags)
-  "Regression"="db618444a4d16b91cccf35d80fa3f306739dd571", #parent of the first commit in the PR that fixes the issue(https://github.com/Rdatatable/data.table/pull/4655/commits)
-  "Fixed"="ec041f78691f9f9495c0f25b78109cd3f5295f4f") #This is the last commit in the PR that fixes the issue (https://github.com/Rdatatable/data.table/pull/4655/commits)
+  "slow"="db618444a4d16b91cccf35d80fa3f306739dd571", #parent of the first commit in the PR that fixes the issue(https://github.com/Rdatatable/data.table/pull/4655/commits)
+  "Fast"="ec041f78691f9f9495c0f25b78109cd3f5295f4f") #This is the last commit in the PR that fixes the issue (https://github.com/Rdatatable/data.table/pull/4655/commits)
 ```
 
 

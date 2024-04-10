@@ -7,39 +7,7 @@ date: "2024-02-02"
  fixed by 5427 https://github.com/Rdatatable/data.table/pull/5427
  
  
- 
-```{r}
-library(data.table)
-DT = replicate(1e7, 1, simplify = FALSE)
-system.time(setDT(DT))
-#    user  system elapsed 
-#  23.043   0.216  23.261 
-```
- 
-```{r}
-# __ON MASTER__
-library(data.table)
 
-DT = replicate(1e7, 1, simplify = FALSE)
-system.time(setDT(DT))
-#    user  system elapsed 
-#  25.518   0.316  25.835 
-
-DT = replicate(1e7, 1, simplify = FALSE)
-system.time(setDT(DT))
-#    user  system elapsed 
-#  20.219   0.292  20.511 
-
-DT = replicate(1e7, 1, simplify = FALSE)
-# _not_ V1:Vncol_, so that these names aren't cached yet (doesn't matter much but still)
-names(DT) = seq_along(DT)
-system.time(setDT(DT))
-#    user  system elapsed 
-#  16.325   0.148  16.474 
-```
- 
- 
- 
  
 ```{r}
 
@@ -95,14 +63,14 @@ atime.list.5427 <- atime::atime_versions(
       sprintf('useDynLib\\("?%s"?', Package_regex),
       paste0('useDynLib(', new.Package_))
   },
-  N=10^seq(1,20),
+  N=10^seq(1,7),
   setup={ 
     DT = replicate(N, 1, simplify = FALSE)
   },
-  expr=data.table:::`[.data.table`(setDT(DT)),
-  "Master"= "6f43a96ad478e02a48f61939e0c0d3047e949353", #https://github.com/Rdatatable/data.table/commit/6f43a96ad478e02a48f61939e0c0d3047e949353,
+  expr=data.table:::setDT(DT),
+  "slow"= "c4a2085e35689a108d67dacb2f8261e4964d7e12", #Parent of the first commit in the PR that fixes the issue(https://github.com/Rdatatable/data.table/commit/7cc4da4c1c8e568f655ab5167922dcdb75953801),
   
-  "PR5427"="bd2fc1eb3faeba573464cd63b2d420a0a4f9514e")#https://github.com/Rdatatable/data.table/pull/5427/commits/bd2fc1eb3faeba573464cd63b2d420a0a4f9514e
+  "Fast"="1872f473b20fdcddc5c1b35d79fe9229cd9a1d15")#last commit in the PR that fixes the issue (https://github.com/Rdatatable/data.table/pull/5427/commits)
 ```
 
 
@@ -116,6 +84,29 @@ plot(atime.list.5427)+
 dev.off()
 
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ```{r}

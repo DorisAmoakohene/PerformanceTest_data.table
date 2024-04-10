@@ -32,11 +32,7 @@ library(directlabels)
   
 ```
 
-
-
-
-system.time(nat <- DT[, .(v3=mean(v3, na.rm=TRUE)), by=id3, verbose=TRUE])
-```{r,warning=FALSE,message=FALSE}
+```{r}
 atime.list.4849 <- atime::atime_versions(
   pkg.path=tdir,
   pkg.edit.fun=function(old.Package, new.Package, sha, new.pkg.path){
@@ -71,29 +67,126 @@ atime.list.4849 <- atime::atime_versions(
       sprintf('useDynLib\\("?%s"?', Package_regex),
       paste0('useDynLib(', new.Package_))
   },
-  seconds.limit=1,
-  N=10^seq(1,9),
+  N=1:(1e9L/1e2L),
   setup={
-    K = 10^seq(1,2)
+    set.seed(108)
+    setDTthreads(0L)
     DT = list()
-    DT[["id3"]] = factor(sample(sprintf("id%010d",1:(N/K)), N, TRUE))
+    DT[["id3"]] = factor(sample(sprintf("id%010d",N), N, TRUE))
     DT[["v3"]] =  round(runif(N,max=100),6)
     setDT(DT)
   },
-  expr= data.table:::`[.data.table`(DT,, .(v3=mean(v3)), by=id3, verbose=TRUE),
-  #"Before"="",
-  "Regression"="267315d4e585462c3dde3e5bbd7ac1f193ce4377",#parent of the first commit in the PR (https://github.com/Rdatatable/data.table/pull/4851/commits/) that fixes the issue (https://github.com/Rdatatable/data.table/commit/3ca0dbfb26c59b047acd6b0c5b400b6222ad6f6b)
-  "fixed"="56b92e1aa7819a2f677d0e664d8fe5bee85a8a5f")#This commit is the second commit in the PR that fixes the issue (https://github.com/Rdatatable/data.table/pull/4851/commits/)
+#   library(data.table) ## 1.13.5
+# setDTthreads(0L) ## 40
+# set.seed(108)
+# N = 1e9L
+# K = 1e2L
+# DT = list()
+# DT[["id3"]] = factor(sample(sprintf("id%010d",1:(N/K)), N, TRUE))
+# DT[["v3"]] =  round(runif(N,max=100),6)
+# setDT(DT)
+#system.time(naf <- DT[, .(v3=mean(v3)), by=id3, verbose=TRUE])
+
+  expr= data.table:::`[.data.table`(DT,, .(v3=mean(v3)), by=id3),
+ 
+  "slow"="267315d4e585462c3dde3e5bbd7ac1f193ce4377",#parent of the first commit in the PR (https://github.com/Rdatatable/data.table/pull/4851/commits/) that fixes the issue (https://github.com/Rdatatable/data.table/commit/3ca0dbfb26c59b047acd6b0c5b400b6222ad6f6b)
+  "fast"="ca52b7e38e7cafb3ee7aa268acdc1b4e5af6c3f0")#This commit is the Last commit in the PR that fixes the issue (https://github.com/Rdatatable/data.table/pull/4851/commits/)
 ```
 
 
 ```{r}
+
+plot(atime.list.4849)
+
 png()
 plot(atime.list.4849)+
   labs(title = "gmean na.rm=TRUE is much slower than na.rm=FALSE #4849")
 
 png("atime.list.4849.png")
 plot(atime.list.4849)+
+  labs(title = "gmean na.rm=TRUE is much slower than na.rm=FALSE #4849")
+dev.off()
+```
+
+
+
+
+
+
+system.time(nat <- DT[, .(v3=mean(v3, na.rm=TRUE)), by=id3, verbose=TRUE])
+```{r,warning=FALSE,message=FALSE}
+atime.list.4849.1 <- atime::atime_versions(
+  pkg.path=tdir,
+  pkg.edit.fun=function(old.Package, new.Package, sha, new.pkg.path){
+    pkg_find_replace <- function(glob, FIND, REPLACE){
+      atime::glob_find_replace(file.path(new.pkg.path, glob), FIND, REPLACE)
+    }
+    Package_regex <- gsub(".", "_?", old.Package, fixed=TRUE)
+    Package_ <- gsub(".", "_", old.Package, fixed=TRUE)
+    new.Package_ <- paste0(Package_, "_", sha)
+    pkg_find_replace(
+      "DESCRIPTION", 
+      paste0("Package:\\s+", old.Package),
+      paste("Package:", new.Package))
+    pkg_find_replace(
+      file.path("src","Makevars.*in"),
+      Package_regex,
+      new.Package_)
+    pkg_find_replace(
+      file.path("R", "onLoad.R"),
+      Package_regex,
+      new.Package_)
+    pkg_find_replace(
+      file.path("R", "onLoad.R"),
+      sprintf('packageVersion\\("%s"\\)', old.Package),
+      sprintf('packageVersion\\("%s"\\)', new.Package))
+    pkg_find_replace(
+      file.path("src", "init.c"),
+      paste0("R_init_", Package_regex),
+      paste0("R_init_", gsub("[.]", "_", new.Package_)))
+    pkg_find_replace(
+      "NAMESPACE",
+      sprintf('useDynLib\\("?%s"?', Package_regex),
+      paste0('useDynLib(', new.Package_))
+  },
+  seconds.limit=1,
+  N=10^seq(1L,9L),
+  setup={
+    setDTthreads(0L)
+    K = 1e2L
+    DT = list()
+    DT[["id3"]] = factor(sample(sprintf("id%010d",1:(N/K)), N, TRUE))
+    DT[["v3"]] =  round(runif(N,max=100),6)
+    setDT(DT)
+  },
+#   library(data.table) ## 1.13.5
+# setDTthreads(0L) ## 40
+# set.seed(108)
+# N = 1e9L
+# K = 1e2L
+# DT = list()
+# DT[["id3"]] = factor(sample(sprintf("id%010d",1:(N/K)), N, TRUE))
+# DT[["v3"]] =  round(runif(N,max=100),6)
+# setDT(DT)
+#system.time(naf <- DT[, .(v3=mean(v3)), by=id3, verbose=TRUE])
+
+  expr= data.table:::`[.data.table`(DT,, .(v3=mean(v3)), by=id3),
+ 
+  "slow"="267315d4e585462c3dde3e5bbd7ac1f193ce4377",#parent of the first commit in the PR (https://github.com/Rdatatable/data.table/pull/4851/commits/) that fixes the issue (https://github.com/Rdatatable/data.table/commit/3ca0dbfb26c59b047acd6b0c5b400b6222ad6f6b)
+  "fast"="ca52b7e38e7cafb3ee7aa268acdc1b4e5af6c3f0")#This commit is the Last commit in the PR that fixes the issue (https://github.com/Rdatatable/data.table/pull/4851/commits/)
+```
+
+
+```{r}
+
+plot(atime.list.4849.1)
+
+png()
+plot(atime.list.4849.1)+
+  labs(title = "gmean na.rm=TRUE is much slower than na.rm=FALSE #4849")
+
+png("atime.list.4849.1.png")
+plot(atime.list.4849.1)+
   labs(title = "gmean na.rm=TRUE is much slower than na.rm=FALSE #4849")
 dev.off()
 ```
