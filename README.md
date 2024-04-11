@@ -3,6 +3,7 @@
 This repository aims to investigate performance regressions in the data.table package, creating relevant performance tests, and using atime to analyze the performance of different data.table versions (before regression, regression, fix regression).
 
 The repository is structured with different folders. One of the folders, named ["Working Examples](https://github.com/DorisAmoakohene/PerformanceTest_data.table/tree/master/Working%20Examples)," houses performance tests that are fully prepared for immediate use. There is another folder named ["Work in Progress"](https://github.com/DorisAmoakohene/PerformanceTest_data.table/tree/master/Work%20In%20Progress) within the repository, which contains various performance tests that are currently being worked on and are not yet finalized.
+The third folder labeled ["partially completed"](https://github.com/DorisAmoakohene/PerformanceTest_data.table/tree/master/Partially%20Completed), contains issues that can be utilized, but misses one commit id (before) due to installations problems. However, there is a possibility that these issue of installation can be resolved in the future.
 
 ## To Start:
 To begin, conduct the atime test for the different data.table versions (before regression, regression, fix regression) to identify potential performance issues.
