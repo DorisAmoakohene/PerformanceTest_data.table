@@ -31,7 +31,7 @@ library(git2r)
 ```{r}
 
 atime.list.4440 <- atime::atime_versions(
-pkg.path=tdir,
+pkg.path= "C:\\Users\\amoak\\mydata.table",
 pkg.edit.fun=function(old.Package, new.Package, sha, new.pkg.path){
       pkg_find_replace <- function(glob, FIND, REPLACE){
         atime::glob_find_replace(file.path(new.pkg.path, glob), FIND, REPLACE)
@@ -74,11 +74,11 @@ pkg.edit.fun=function(old.Package, new.Package, sha, new.pkg.path){
   },
 
   expr=data.table:::shallow(dt),
-  #"Before"="793f8545c363d222de18ac892bc7abb80154e724",
-#https://github.com/tlapak/data.table/commit/89830e97b1582c1f4603b6b8f0260e0945876a27
-  "Regression"="dd7609e83132e19c9be80d71c73e8a8f95e19b27", 
-#https://github.com/Rdatatable/data.table/tree/752012f577f8e268bb6d0084ca39a09fa7fbc1c4
-  "Fixed"="9d3b9202fddb980345025a4f6ac451ed26a423be")#https://github.com/Rdatatable/data.table/commit/9d3b9202fddb980345025a4f6ac451ed26a423be 
+  #"Before"="",
+#This is a three code branch issue but before  cannot be found, 
+  "Regression"="b1b1832b0d2d4032b46477d9fe6efb15006664f4", 
+#parent of the first commits in the PR that fixes the regression(https://github.com/Rdatatable/data.table/commit/0f0e7127b880df8459b0ed064dc841acd22f5b73)
+  "Fixed"="40f9165a265f68b87ffb3cb00efbaa9540c2dcb8")# commit "Merge branch 'master' into tuning_shallow in the PR that fixes the regression" (https://github.com/Rdatatable/data.table/pull/4440/commits)
 
 
 ```

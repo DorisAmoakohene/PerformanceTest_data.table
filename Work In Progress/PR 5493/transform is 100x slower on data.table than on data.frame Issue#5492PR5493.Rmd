@@ -34,7 +34,7 @@ C:\\Users\\amoak\\ofeik
 ```{r}
 
 atime.list.5493 <- atime::atime_versions(
-pkg.path <- "C:\\Users\\amoak\\ofeik",
+pkg.path <- "C:\\Users\\amoak\\ofeikshilon",
 pkg.edit.fun=function(old.Package, new.Package, sha, new.pkg.path){
       pkg_find_replace <- function(glob, FIND, REPLACE){
         atime::glob_find_replace(file.path(new.pkg.path, glob), FIND, REPLACE)
