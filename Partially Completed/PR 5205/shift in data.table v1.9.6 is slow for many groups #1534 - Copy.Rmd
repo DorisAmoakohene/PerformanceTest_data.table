@@ -94,9 +94,9 @@ atime.list.1534 <- atime::atime_versions(
     DT = data.table(x = sample(N), y = sample(1e2,N,TRUE))
   },
   expr=data.table:::`[.data.table`(DT,, shift(x, 1, type="lag"), y),
-  "Before"="4eada9760352d243896628ecaf61ec934338dc3b",#https://github.com/Rdatatable/data.table/commit/9e6e45301ea89227414a4f6df1ffc679c5c7ef1c
-  "Regression"="9e6e45301ea89227414a4f6df1ffc679c5c7ef1c", #https://github.com/Rdatatable/data.table/commit/cd818080606591ac5348005732db0cadfb4e597c
-  "Fixed"="e88826e94127991754a8821ac8149d15f1f9c3c2")#https://github.com/Rdatatable/data.table/commit/e88826e94127991754a8821ac8149d15f1f9c3c2
+  #"Before"="c2c8ed4936d89d1ac1d1656c6fa5cca565f15f7d",#tag 1.9.2 (https://github.com/Rdatatable/data.table/tags)https://github.com/Rdatatable/data.table/commit/c2c8ed4936d89d1ac1d1656c6fa5cca565f15f7d
+  "Regression"="7f0ce147eef1dd5cd5ff05dffc3c72f472bcde51", #parent of the first commits in the PR that fixes the issue6(https://github.com/Rdatatable/data.table/commit/58135017a985f3cc2c6f0d091c4effaec4442f56)
+  "Fixed"="a6abac319446ae7dde8bc4501fae40eeb5cc228c")#commit before the last commit in the PR that fixes the regression(https://github.com/Rdatatable/data.table/pull/5205/commits)
 ```
 
 
