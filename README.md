@@ -80,6 +80,12 @@ D.
 
 # 3.
 
+A. The issue that reported the regression is [here](https://github.com/Rdatatable/data.table/issues/3735). They reported that selecting by row number from a data.table is much slower than from a data.frame. 
+
+B. I couldn’t find the specific pull request that caused the regression. 
+
+C. The pull request that fixed the regression can be found [here](https://github.com/Rdatatable/data.table/pull/4488). However, I couldn’t find specific details about the changes made to fix the regression. It’s likely that the changes involved optimizing the way data.table handles row selection to make it more efficient. 
+
 D. [This is the link to my atime code](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/Working%20Examples/PR%204488/Selecting%20from%20data.table%20by%20row%20is%20very%20slow%20%233735%20-%20Copy.Rmd)
 
 ![Plot showing the the memory and time metrics of the issue from the atime](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/Working%20Examples/PR%204488/atime.list.3735.png)
