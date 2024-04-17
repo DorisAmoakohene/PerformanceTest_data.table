@@ -133,6 +133,12 @@ D. [This is the link to my atime code](https://github.com/DorisAmoakohene/Perfor
 
 # 7
 
+A. [ The problem is related to the performance of the [[ operation by group. Specifically, with version 1.13.0, this operation takes over 24 hours to process, whereas in version 1.12.8, it completes in just 4 seconds.](https://github.com/Rdatatable/data.table/issues/4646)
+
+B. [The regression is caused by a change in the behavior of the `` operation for grouped data. In the release notes, it’s mentioned that GForce (a performance optimization) is deactivated for [[ on non-atomic input.](https://stackoverflow.com/questions/63105711/why-data-table-unnesting-time-grows-with-the-square-of-number-of-rows-for-a-spec)
+
+C. The specific details of the issue's fixes cannot be accurately described at the moment. However, you can find more information about the pull request (PR) that addresses the problem by referring to [this](https://github.com/Rdatatable/data.table/pull/5427)
+
 D. [This is the link to my atime code](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/Partially%20Completed/PR%204655/%5B%5B%20by%20group%20performance%20%234655.Rmd)
 
 ![Plot showing the the memory and time metrics of the issue from the atime](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/Partially%20Completed/PR%204655/atime.list.4646.png)
