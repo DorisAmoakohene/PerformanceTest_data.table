@@ -93,6 +93,12 @@ D. [This is the link to my atime code](https://github.com/DorisAmoakohene/Perfor
 
 # 4.
 
+A. [The reported regression involves the setDT function being significantly slow when applied to very wide input data](https://github.com/Rdatatable/data.table/issues/5426)
+
+B. There is no Before for this issue.
+
+C. Moving the R code to C code resolved the regression issue, resulting in improved performance of setDT. [This enhancement specifically benefits wide input data by making it faster, as checks are now implemented in C.](https://github.com/Rdatatable/data.table/pull/5427)
+
 D. [This is the link to my atime code](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/Working%20Examples/PR%205427/setDT%20extremely%20slow%20for%20very%20wide%20input%20%235426%20-%20Copy.Rmd)
 
 ![Plot showing the the memory and time metrics of the issue from the atime](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/Working%20Examples/PR%205427/atime.list.5427.png)
