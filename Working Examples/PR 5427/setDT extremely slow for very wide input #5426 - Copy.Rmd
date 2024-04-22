@@ -78,12 +78,24 @@ atime.list.5427 <- atime::atime_versions(
 plot(atime.list.5427)+
   labs(title = "setDT extremely slow for very wide input #5426")
 
-png("atime.list.5427.png")
+png("atime.list.5427.png", res = 600, width = 13, height = 8, unit = "in")
 plot(atime.list.5427)+
-  labs(title = "setDT extremely slow for very wide input #5426")
+  labs(title = "setDT extremely slow for very wide input #5426")+
+  theme( plot.title = element_text(size = 30))
+dev.off()
+```
+
+
+
+plot(atime.list.4200)+
+  labs(title = "groupby with dogroups (R expression) performance regression")
+
+png("atime.list.4200.png", width = 8, height = 5, unit = "in")
+plot(atime.list.4200)+
+  labs(title = "groupby with dogroups (R expression) performance regression") +
+  theme( element_text(size = 20))
 dev.off()
 
-```
 
 
 

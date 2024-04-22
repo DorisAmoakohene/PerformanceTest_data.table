@@ -82,10 +82,15 @@ pkg.edit.fun=function(old.Package, new.Package, sha, new.pkg.path){
 ```{r}
 plot(atime.list.4200)+
   labs(title = "groupby with dogroups (R expression) performance regression")
+```
 
-png("atime.list.4200.png")
+
+```{r}
+png()
+png("atime.list.4200.png",res = 600, width = 10, height = 5, unit = "in")
 plot(atime.list.4200)+
-  labs(title = "groupby with dogroups (R expression) performance regression")
+  labs(title = "groupby with dogroups (R expression) performance regression") #+
+  theme( plot.title = element_text(size = 50))
 dev.off()
 
 ```
