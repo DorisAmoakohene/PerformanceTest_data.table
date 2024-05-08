@@ -70,8 +70,8 @@ pkg.edit.fun=function(old.Package, new.Package, sha, new.pkg.path){
   },
 
   expr=data.table:::`[.data.table`(d, , (max(v1)-min(v2)), by = id3),
-"Before"="15f0598b9828d3af2eb8ddc9b38e0356f42afe4f",
-"Fixed"="8bf5b5c4afa8e8fac8d55bcbd131463a80bb49fd")#https://github.com/Rdatatable/data.table/pull/4386/commits/8bf5b5c4afa8e8fac8d55bcbd131463a80bb49fd
+"slow"="b1b1832b0d2d4032b46477d9fe6efb15006664f4",#partent (https://github.com/Rdatatable/data.table/commit/b1b1832b0d2d4032b46477d9fe6efb15006664f4) of the first commit  in the PR that fixes the regression(https://github.com/Rdatatable/data.table/pull/4386/commits)
+"fast"="8bf5b5c4afa8e8fac8d55bcbd131463a80bb49fd")# last commit in the PR that fixes the regression(https://github.com/Rdatatable/data.table/pull/4386/commits)
 ```
 
 
