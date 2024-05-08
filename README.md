@@ -7,6 +7,10 @@ The third folder labeled ["partially completed"](https://github.com/DorisAmoakoh
 
 Each folder includes a subfolders named after the PR/Issue numbers. Inside the PR/Issue folder, you'll find an RMD file containing the code used for the test, along with PNG files displaying the resulting images.
 
+## GitHub action for continuous performance testing:
+
+As part of the project, we perform continuous benchmarking for the data.table package to assess its asymptotic time and memory usage. We utilize the "atime" package in R developed by @tdhock for this purpose. The benchmarking process is automated using a GitHub action implemented by @anirban166. This action runs the "atime" package for every pull request and generates plots of the results in a comment within the pull request. This allows us to easily determine if a pull request has any impact on the performance of the data.table package. For more information about this benchmarking process, you can visit the following link: [GitHub Action for Continuous Performance Testing](https://github.com/tdhock/atime?tab=readme-ov-file#github-action-for-continuous-performance-testing) 
+
 
 ## Details on how to perform a performance regression test
 To begin, conduct the atime test for the different data.table versions (before regression, regression, fix regression) to identify potential performance issues.
