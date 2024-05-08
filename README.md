@@ -9,7 +9,15 @@ Each folder includes a subfolders named after the PR/Issue numbers. Inside the P
 
 ## GitHub action for continuous performance testing:
 
-As part of the project, we perform continuous benchmarking for the data.table package to assess its asymptotic time and memory usage. We utilize the "atime" package in R developed by @tdhock for this purpose. The benchmarking process is automated using a GitHub action implemented by @anirban166. This action runs the "atime" package for every pull request and generates plots of the results in a comment within the pull request. This allows us to easily determine if a pull request has any impact on the performance of the data.table package. For more information about this benchmarking process, you can visit the following link: [GitHub Action for Continuous Performance Testing](https://github.com/tdhock/atime?tab=readme-ov-file#github-action-for-continuous-performance-testing) 
+As part of the project, we perform continuous benchmarking for the data.table package to assess its asymptotic time and memory usage. We utilize the "atime" package in R developed by @tdhock for this purpose. The benchmarking process is automated using a GitHub action implemented by @anirban166. This action runs the "atime" package for every pull request and generates plots of the results in a comment within the pull request. This allows us to easily determine if a pull request has any impact on the performance of the data.table package. 
+
+"testComplexity" and "bench" are additional packages which can be utilized for GitHub actions.
+
+bench::press allows for multi-dimensional grid search and flexibility, but it cannot store results if check=FALSE, results must be equal if check=TRUE, and it lacks an easy way to specify a time limit for larger sizes.
+
+testComplexity::asymptoticTimings performs similar tasks but only for a single expression, lacks a special setup argument like atime, and requires timing to include potentially irrelevant data setup code.
+
+For more information about this benchmarking process, you can visit the following link: [GitHub Action for Continuous Performance Testing](https://github.com/tdhock/atime?tab=readme-ov-file#github-action-for-continuous-performance-testing) 
 
 
 ## Details on how to perform a performance regression test
