@@ -155,6 +155,6 @@ D. [This is the link to my atime code](https://github.com/DorisAmoakohene/Perfor
 
 ![Plot showing the the memory and time metrics of the issue from the atime](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/Partially%20Completed/PR%204655/atime.list.4646.png)
 
-This issue is related the the above grph and was fixed by the same PR
+This issue is related to the the above graph and was fixed by the same PR
 
 ![Plot showing the the memory and time metrics of the issue from the atime](https://github.com/DorisAmoakohene/PerformanceTest_data.table/blob/master/Partially%20Completed/PR%204655/atime.list.4655.png)
